@@ -242,11 +242,13 @@ body:has(.popup-overlay.open) {
     left: 0;
     right: 0;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: 8px 24px 24px;
-    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 24px 32px;
+    padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
     transform: translateY(100%);
-    max-height: 85dvh;
+    max-height: 92dvh;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
   .popup-sheet.open {
     transform: translateY(0);
@@ -494,3 +496,8 @@ body:has(.popup-overlay.open) {
   transition: transform 0.2s;
 }
 .footer-link:active { transform: scale(0.95); }
+
+/* Ensure content inside popup-sheet is block for scrolling */
+.popup-sheet > * {
+  flex-shrink: 0;
+}

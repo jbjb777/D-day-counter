@@ -389,11 +389,13 @@
         renderColorRow();
         document.getElementById('overlay').classList.add('open');
         document.getElementById('addSheet').classList.add('open');
+        document.body.classList.add('locked');
       }
 
       function closePopup() {
         document.getElementById('overlay').classList.remove('open');
         document.getElementById('addSheet').classList.remove('open');
+        document.body.classList.remove('locked');
       }
 
       function renderColorRow() {
@@ -553,11 +555,13 @@
         document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
         document.getElementById('delOverlay').classList.add('open');
         document.getElementById('delSheet').classList.add('open');
+        document.body.classList.add('locked');
       }
 
       function closeDelPopup() {
         document.getElementById('delOverlay').classList.remove('open');
         document.getElementById('delSheet').classList.remove('open');
+        document.body.classList.remove('locked');
       }
 
       document.getElementById('confirmDelBtn').onclick = () => {
