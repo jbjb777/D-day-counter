@@ -340,6 +340,18 @@ body {
 }
 
 /* ===== BANNER (Flat 2D) ===== */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  border: 1px solid transparent;
+  z-index: 1; /* Ensure relative positioning for z-index */
+}
+.card:has(.overflow-menu.open) {
+  z-index: 10;
+}
 .banner {
   background: var(--accent-light);
   border-radius: var(--radius-xl);
@@ -389,17 +401,25 @@ body {
 
 /* ===== OVERFLOW MENU ===== */
 .overflow-menu {
-  position: absolute; top: calc(100% + 8px); right: 0;
-  background: white; border-radius: var(--radius);
-  border: 1px solid var(--surface2);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-  opacity: 0; visibility: hidden;
-  transform: translateY(-8px) scale(0.95);
-  transition: all 0.2s ease;
-  z-index: 50;
-  min-width: 150px;
+  position: absolute;
+  top: 48px;
+  right: 24px;
+  background: white;
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 8px;
+  min-width: 100px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.overflow-menu.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.overflow-menu.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: all; }
 .overflow-item {
   padding: 14px 16px; font-size: 14px; font-weight: 500; cursor: pointer;
 }
@@ -414,3 +434,31 @@ body {
 .cat-red    { --cat: #F04452; --cat-bg: #FEECEF; }
 .cat-yellow { --cat: #FFAD13; --cat-bg: #FFF7E6; }
 .cat-teal   { --cat: #00C7BE; --cat-bg: #E6F9F8; }
+
+/* ===== FULL SCREEN MODE ===== */
+.fs-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: white; z-index: 2000;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  animation: pageIn 0.4s ease both;
+}
+.fs-overlay.open { display: flex; }
+
+.fs-content { text-align: center; }
+.fs-dday { font-size: 80px; font-weight: 800; color: var(--cat); margin-bottom: 20px; letter-spacing: -2px; }
+.fs-hms { display: flex; gap: 32px; align-items: center; justify-content: center; }
+.fs-hms-item { text-align: center; }
+.fs-hms-num { font-size: 48px; font-weight: 800; color: var(--text-primary); min-width: 1.5em; }
+.fs-hms-label { font-size: 14px; color: var(--text-secondary); font-weight: 700; margin-top: 8px; }
+
+.exit-fs-btn {
+  position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+  width: 56px; height: 56px; border-radius: 16px; border: none;
+  background: var(--surface); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.4s, transform 0.4s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  z-index: 2100;
+}
+.exit-fs-btn.hide { opacity: 0; transform: translateX(-50%) translateY(20px); pointer-events: none; }
+.exit-fs-btn img { width: 24px; height: 24px; opacity: 0.6; }

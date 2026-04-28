@@ -50,6 +50,7 @@
       display: flex;
       flex-direction: column;
       align-items: flex-start;
+      position: relative;
     }
 
     .hero-category {
@@ -108,6 +109,24 @@
       font-weight: 600;
       margin-top: 2px;
     }
+
+    .btn-max {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--surface2);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .btn-max:hover { background: var(--border-dark); }
+    .btn-max img { width: 20px; height: 20px; opacity: 0.6; }
 
     .info-section {
       margin: 0 20px 32px;
@@ -179,6 +198,9 @@
       </div>
 
       <div class="hero" id="hero">
+        <button class="btn-max" onclick="toggleFullScreen(true)">
+          <img src="max.svg" alt="Maximize">
+        </button>
         <div id="heroContent"></div>
       </div>
 
@@ -191,6 +213,30 @@
         <button class="btn btn-danger btn-full" onclick="openDeleteConfirm()">삭제하기</button>
       </div>
 
+    </div>
+
+    <!-- Full Screen Overlay -->
+    <div class="fs-overlay" id="fsOverlay">
+      <div class="fs-content">
+        <div class="fs-dday" id="fsDday">D-0</div>
+        <div class="fs-hms">
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsH"></div>
+            <div class="fs-hms-label">시간</div>
+          </div>
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsM"></div>
+            <div class="fs-hms-label">분</div>
+          </div>
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsS"></div>
+            <div class="fs-hms-label">초</div>
+          </div>
+        </div>
+      </div>
+      <button class="exit-fs-btn" id="exitFsBtn" onclick="toggleFullScreen(false)">
+        <img src="min.svg" alt="Minimize">
+      </button>
     </div>
 
     <!-- Edit popup -->
@@ -276,6 +322,8 @@
       let selectedColor = 'cat-blue';
       let curViewDate = new Date();
       let selDate = new Date();
+      let isFullScreen = false;
+      let fsTimer = null;
 
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
       function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
@@ -311,33 +359,41 @@
         const t = calcDiff(item.date);
         const hero = document.getElementById('heroContent');
         hero.innerHTML = `
-    <div class="hero-category">UPCOMING EVENT</div>
-    <div class="hero-title">${escHtml(item.title)}</div>
-    <div class="hero-dday-row">
-      <span class="hero-prefix">D-</span>
-      <span class="hero-num" id="heroNum">${t ? t.d : 'Day'}</span>
-    </div>
-    <div class="hero-hms">
-      <div class="hero-hms-item"><div class="hero-hms-num" id="hH"></div><div class="hero-hms-label">시간</div></div>
-      <div class="hero-hms-item"><div class="hero-hms-num" id="hM"></div><div class="hero-hms-label">분</div></div>
-      <div class="hero-hms-item"><div class="hero-hms-num" id="hS"></div><div class="hero-hms-label">초</div></div>
-    </div>`;
+          <div class="hero-category">UPCOMING EVENT</div>
+          <div class="hero-title">${escHtml(item.title)}</div>
+          <div class="hero-dday-row">
+            <span class="hero-prefix">D-</span>
+            <span class="hero-num" id="heroNum">${t ? t.d : 'Day'}</span>
+          </div>
+          <div class="hero-hms">
+            <div class="hero-hms-item"><div class="hero-hms-num" id="hH"></div><div class="hero-hms-label">시간</div></div>
+            <div class="hero-hms-item"><div class="hero-hms-num" id="hM"></div><div class="hero-hms-label">분</div></div>
+            <div class="hero-hms-item"><div class="hero-hms-num" id="hS"></div><div class="hero-hms-label">초</div></div>
+          </div>`;
 
         if (t) {
           slotRender(document.getElementById('hH'), t.h, 'hH');
           slotRender(document.getElementById('hM'), t.m, 'hM');
           slotRender(document.getElementById('hS'), t.s, 'hS');
+          
+          if (isFullScreen) {
+            document.getElementById('fsDday').textContent = `D-${t.d}`;
+            slotRender(document.getElementById('fsH'), t.h, 'fsH');
+            slotRender(document.getElementById('fsM'), t.m, 'fsM');
+            slotRender(document.getElementById('fsS'), t.s, 'fsS');
+          }
         } else {
           document.querySelectorAll('.hero-hms-num').forEach(el => el.textContent = '00');
+          if (isFullScreen) document.getElementById('fsDday').textContent = 'D-Day';
         }
 
         const statusText = t ? '진행 중' : '완료';
         const statusIcon = t ? 'time.svg' : 'ok.svg';
 
         document.getElementById('infoRows').innerHTML = `
-    <div class="info-row"><span class="info-key">날짜</span><span class="info-val">${formatDateFull(item.date)}</span></div>
-    <div class="info-row"><span class="info-key">구분</span><span class="info-val" style="color:${colorObj.hex}">${item.title}</span></div>
-    <div class="info-row"><span class="info-key">상태</span><span class="info-val">${statusText} <img src="${statusIcon}"></span></div>`;
+          <div class="info-row"><span class="info-key">날짜</span><span class="info-val">${formatDateFull(item.date)}</span></div>
+          <div class="info-row"><span class="info-key">구분</span><span class="info-val" style="color:${colorObj.hex}">${item.title}</span></div>
+          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${statusText} <img src="${statusIcon}"></span></div>`;
       }
 
       function calcDiff(dateStr) {
@@ -351,6 +407,37 @@
         const d = new Date(dateStr);
         return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
       }
+
+      // ===== FULL SCREEN =====
+      function toggleFullScreen(on) {
+        isFullScreen = on;
+        const overlay = document.getElementById('fsOverlay');
+        const btn = document.getElementById('exitFsBtn');
+        if (on) {
+          overlay.classList.add('open');
+          resetFsTimer();
+        } else {
+          overlay.classList.remove('open');
+          clearTimeout(fsTimer);
+        }
+        renderPage();
+      }
+
+      function resetFsTimer() {
+        const btn = document.getElementById('exitFsBtn');
+        btn.classList.remove('hide');
+        clearTimeout(fsTimer);
+        fsTimer = setTimeout(() => {
+          if (isFullScreen) btn.classList.add('hide');
+        }, 1500);
+      }
+
+      document.getElementById('fsOverlay').addEventListener('mousedown', () => {
+        if (isFullScreen) resetFsTimer();
+      });
+      document.getElementById('fsOverlay').addEventListener('touchstart', () => {
+        if (isFullScreen) resetFsTimer();
+      });
 
       // ===== CALENDAR =====
       function initPicker(existingDate) {
