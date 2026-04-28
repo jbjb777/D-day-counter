@@ -8,310 +8,113 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="./logo.png">
   <style>
-    /* ===== HOME SPECIFIC (Flat 2D) ===== */
-    .app {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px 0 100px;
-    }
+    .app { max-width: 600px; margin: 0 auto; padding: 20px 0 100px; }
+    .header { padding: 20px; margin-bottom: 10px; }
+    .header-title { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; }
+    .header-sub { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+    .banner-wrap { padding: 0 20px 24px; }
+    .banner { background: var(--accent-light); border-radius: 24px; min-height: 160px; padding: 30px; position: relative; display: flex; flex-direction: column; justify-content: center; transition: 0.2s; }
+    .banner-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+    .banner-dday { font-size: 48px; font-weight: 800; color: var(--accent); letter-spacing: -2px; }
+    
+    .section-header { padding: 0 20px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 18px; font-weight: 700; }
+    .section-count { font-size: 14px; color: var(--text-secondary); }
+    
+    .card-list { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+    .card-inner { padding: 24px; }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .card-title { font-size: 16px; font-weight: 700; }
+    .card-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cat); margin-bottom: 8px; }
+    .card-d-num { font-size: 40px; font-weight: 800; color: var(--cat); letter-spacing: -1px; }
+    .card-hms { display: flex; gap: 10px; margin-top: 4px; font-size: 12px; color: var(--text-secondary); }
+    .card-hms-num { color: var(--text-primary); font-weight: 700; }
+    
+    .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 20px; border: none; background: var(--accent); color: white; cursor: pointer; box-shadow: 0 8px 24px rgba(49,130,246,0.3); z-index: 40; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .fab:active { transform: scale(0.9); }
+    .fab img { width: 24px; height: 24px; }
+    
+    .slot-container { display: inline-flex; overflow: hidden; height: 1.2em; vertical-align: bottom; }
+    .slot-digit { position: relative; overflow: hidden; height: 1.2em; width: 0.65em; text-align: center; }
+    .slot-inner { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; animation: slotRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .slot-num { height: 1.2em; line-height: 1.2em; }
+    @keyframes slotRoll { from { transform: translateY(0); } to { transform: translateY(-1.2em); } }
 
-    .header {
-      padding: 20px;
-      margin-bottom: 10px;
-    }
-
-    .header-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.8px;
-    }
-
-    .header-sub {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    .banner-wrap {
-      padding: 0 20px 24px;
-    }
-
-    .banner:active {
-      transform: scale(0.98);
-    }
-
-    .section-header {
-      padding: 0 20px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .section-count {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    .card-list {
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-      border: 1px solid transparent;
-    }
-
-    .card:active {
-      transform: scale(0.98);
-      background: var(--surface2);
-    }
-
-    .card-inner {
-      padding: 24px;
-    }
-
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .card-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--cat);
-      margin-bottom: 8px;
-    }
-
-    .card-dday-row {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-
-    .card-d-prefix {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-
-    .card-d-num {
-      font-size: 40px;
-      font-weight: 800;
-      color: var(--cat);
-      letter-spacing: -1px;
-    }
-
-    .card-hms {
-      display: flex;
-      gap: 10px;
-      margin-top: 4px;
-    }
-
-    .card-hms-item {
-      font-size: 12px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .card-hms-num {
-      color: var(--text-primary);
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .card-date {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-top: 16px;
-    }
-
-    .fab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 20px;
-      border: none;
-      background: var(--accent);
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(49, 130, 246, 0.3);
-      z-index: 40;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-    }
-
-    .fab:active {
-      transform: scale(0.9);
-    }
-
-    .fab img {
-      width: 24px;
-      height: 24px;
-    }
-
-    /* Animations */
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .card {
-      animation: slideUp 0.4s ease both;
-    }
-
-    .popup-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 32px;
-    }
+    .overflow-menu { position: absolute; top: 48px; right: 24px; background: white; border: 1px solid var(--border-dark); border-radius: 12px; padding: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); z-index: 100; display: flex; flex-direction: column; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.2s; }
+    .overflow-menu.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .overflow-item { padding: 12px 16px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }
+    .overflow-item:hover { background: var(--surface); }
   </style>
 </head>
 
 <body>
   <div class="page-wrapper">
     <div class="app">
-
       <div class="header">
         <div class="header-title">D-Day</div>
         <div id="headerSub" class="header-sub">오늘도 힘차게! 🚀</div>
       </div>
-
-      <div class="banner-wrap">
-        <div class="banner" id="bannerCard">
-          <div id="bannerContent"></div>
-        </div>
-      </div>
-
-      <div class="section-header">
-        <span class="section-title">전체 로그</span>
-        <span class="section-count" id="sectionCount">0개</span>
-      </div>
-
+      <div class="banner-wrap"><div class="banner" id="bannerCard"><div id="bannerContent"></div></div></div>
+      <div class="section-header"><span class="section-title">전체 로그</span><span class="section-count" id="sectionCount">0개</span></div>
       <div id="cardList" class="card-list"></div>
-
       <div id="emptyState" style="display:none; text-align:center; padding: 60px 20px; color: var(--text-secondary);">
         <img src="new.svg" alt="New" style="width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.6;">
-        <div style="font-size: 16px; font-weight: 600; line-height: 1.6;">
-          아직 D-Day가 등록되있지 않아요<br>
-          <span style="font-size: 14px; font-weight: 400; color: var(--text-tertiary);">추가 버튼을 눌러 추가해 보아요</span>
-        </div>
+        <div style="font-size: 16px; font-weight: 600;">아직 D-Day가 등록되있지 않아요</div>
       </div>
-
       <footer class="footer">
         <span class="footer-label">제작자 정보</span>
-        <div class="footer-main">
-          <img src="jb.png" alt="JB" class="footer-logo">
-          <span class="footer-name">JBJB</span>
-        </div>
+        <div class="footer-main"><img src="jb.png" alt="JB" class="footer-logo"><span class="footer-name">JBJB</span></div>
         <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
       </footer>
-
     </div>
 
-    <button class="fab" onclick="openAddPopup()">
-      <img src="plus.svg" alt="Add">
-    </button>
+    <button class="fab" onclick="openAddPopup()"><img src="plus.svg" alt="Add"></button>
 
-    <!-- Add popup -->
     <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
     <div class="popup-sheet" id="addSheet">
       <div class="popup-handle"></div>
       <div class="popup-title">새로운 로그</div>
-
       <div style="margin-bottom: 24px;">
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
+        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
         <input class="input" id="inputTitle" type="text" placeholder="어떤 일인가요?" maxlength="20" oninput="hideError()">
-        <div id="titleError" class="error-msg">제목을 입력해 주세요</div>
+        <div id="titleError" class="error-msg" style="color:var(--danger); font-size:12px; display:none;">제목을 입력해 주세요</div>
       </div>
-
       <div style="margin-bottom: 24px;">
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜
-          및 시간</label>
+        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜 및 시간</label>
         <div class="calendar-wrap">
           <div class="cal-header">
-            <button class="cal-btn" onclick="changeMonth(-1)"><img src="back.svg"></button>
+            <button class="cal-btn" style="background:none; border:none; cursor:pointer;" onclick="changeMonth(-1)"><img src="back.svg" style="width:20px;"></button>
             <div class="cal-month" id="calMonth"></div>
-            <button class="cal-btn next" onclick="changeMonth(1)"><img src="back.svg"></button>
+            <button class="cal-btn" style="background:none; border:none; cursor:pointer;" onclick="changeMonth(1)"><img src="back.svg" style="width:20px; transform:scaleX(-1);"></button>
           </div>
-          <div id="calGridContainer" style="overflow: hidden;">
-            <div class="cal-grid" id="calGrid"></div>
-          </div>
+          <div id="calGridContainer" style="overflow: hidden;"><div class="cal-grid" id="calGrid"></div></div>
           <div class="time-picker">
-            <div class="time-col">
-              <label class="time-label">시간</label>
-              <select class="time-select" id="selHour"></select>
-            </div>
-            <div class="time-col">
-              <label class="time-label">분</label>
-              <select class="time-select" id="selMin"></select>
-            </div>
+            <div class="time-col"><label class="time-label">시간</label><select class="time-select" id="selHour"></select></div>
+            <div class="time-col"><label class="time-label">분</label><select class="time-select" id="selMin"></select></div>
           </div>
         </div>
       </div>
-
       <div>
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
+        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
         <div id="colorRow" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
-
       <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closePopup()">취소</button>
-        <button class="btn btn-primary" onclick="submitAdd()">추가하기</button>
+        <button class="btn btn-ghost" style="padding:14px; border-radius:14px;" onclick="closePopup()">취소</button>
+        <button class="btn btn-primary" style="padding:14px; border-radius:14px;" onclick="submitAdd()">추가하기</button>
       </div>
     </div>
 
-    <!-- Delete confirmation -->
     <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
-    <div class="popup-sheet" id="delSheet" style="text-align: center; padding-top: 40px;">
-      <div style="margin-bottom: 20px;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
-      <div class="popup-title" style="margin-bottom: 8px;">정말 삭제할까요?</div>
-      <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14px;">삭제된 로그는 복구할 수 없습니다.</p>
+    <div class="popup-sheet" id="delSheet" style="text-align: center;">
+      <div class="popup-handle"></div>
+      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
+      <div class="popup-title">정말 삭제할까요?</div>
       <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closeDelPopup()">취소</button>
-        <button class="btn btn-primary" style="background:var(--danger)" id="confirmDelBtn">삭제</button>
+        <button class="btn btn-ghost" style="padding:14px; border-radius:14px;" onclick="closeDelPopup()">취소</button>
+        <button class="btn btn-primary" style="padding:14px; border-radius:14px; background:var(--danger);" id="confirmDelBtn">삭제</button>
       </div>
     </div>
-
-    <!-- Notification -->
-    <div class="notif-banner" id="notif">
-      <span>D-Day 가 삭제되었어요</span>
-    </div>
+    <div class="notif-banner" id="notif"><span>D-Day 가 삭제되었어요</span></div>
 
     <script>
       const COLORS = [
@@ -323,7 +126,6 @@
         { cls: 'cat-red', hex: '#F04452' },
         { cls: 'cat-teal', hex: '#00C7BE' },
       ];
-
       let selectedColor = COLORS[0].cls;
       let curViewDate = new Date();
       let selDate = new Date(); selDate.setHours(0, 0, 0, 0);
@@ -332,332 +134,125 @@
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
       function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
 
-      // ===== CALENDAR =====
       function initPicker() {
-        const h = document.getElementById('selHour');
-        const m = document.getElementById('selMin');
+        const h = document.getElementById('selHour'); const m = document.getElementById('selMin');
         h.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}시</option>`).join('');
         m.innerHTML = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}분</option>`).join('');
-        h.value = new Date().getHours();
-        m.value = 0;
-        renderCalendar();
+        h.value = new Date().getHours(); m.value = 0; renderCalendar();
       }
-
       function renderCalendar() {
-        const grid = document.getElementById('calGrid');
-        const monLabel = document.getElementById('calMonth');
-        const y = curViewDate.getFullYear();
-        const m = curViewDate.getMonth();
-        monLabel.textContent = `${y}년 ${m + 1}월`;
-
-        const first = new Date(y, m, 1).getDay();
-        const last = new Date(y, m + 1, 0).getDate();
+        const grid = document.getElementById('calGrid'); const monLabel = document.getElementById('calMonth');
+        const y = curViewDate.getFullYear(); const m = curViewDate.getMonth(); monLabel.textContent = `${y}년 ${m + 1}월`;
+        const first = new Date(y, m, 1).getDay(); const last = new Date(y, m + 1, 0).getDate();
         let html = ['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
         for (let i = 0; i < first; i++) html += '<div></div>';
         const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 1; i <= last; i++) {
           const d = new Date(y, m, i);
-          const isSel = d.getTime() === selDate.getTime();
-          const isToday = d.getTime() === today.getTime();
-          const isPast = d.getTime() < today.getTime();
-          html += `<div class="cal-date ${isSel ? 'selected' : ''} ${isToday ? 'today' : ''} ${isPast ? 'disabled' : ''}" 
-              onclick="pickDate(${y},${m},${i})">${i}</div>`;
+          html += `<div class="cal-date ${d.getTime() === selDate.getTime() ? 'selected' : ''} ${d.getTime() === today.getTime() ? 'today' : ''} ${d.getTime() < today.getTime() ? 'disabled' : ''}" onclick="pickDate(${y},${m},${i})">${i}</div>`;
         }
         grid.innerHTML = html;
       }
+      function changeMonth(dir) { curViewDate.setMonth(curViewDate.getMonth() + dir); renderCalendar(); }
+      function pickDate(y, m, d) { selDate = new Date(y, m, d, 0, 0, 0, 0); renderCalendar(); }
 
-      function changeMonth(dir) {
-        const grid = document.getElementById('calGrid');
-        grid.classList.remove('slide-left', 'slide-right');
-        void grid.offsetWidth;
-        grid.classList.add(dir > 0 ? 'slide-left' : 'slide-right');
-        curViewDate.setMonth(curViewDate.getMonth() + dir);
-        renderCalendar();
-      }
-
-      function pickDate(y, m, d) {
-        selDate = new Date(y, m, d, 0, 0, 0, 0);
-        renderCalendar();
-      }
-
-      // ===== ACTIONS =====
       function openAddPopup() {
-        document.getElementById('inputTitle').value = '';
-        curViewDate = new Date();
-        selDate = new Date(); selDate.setHours(0, 0, 0, 0);
-        initPicker();
-        renderColorRow();
-        document.getElementById('overlay').classList.add('open');
-        document.getElementById('addSheet').classList.add('open');
-        document.body.classList.add('locked');
+        document.getElementById('inputTitle').value = ''; initPicker(); renderColorRow();
+        document.getElementById('overlay').classList.add('open'); document.getElementById('addSheet').classList.add('open'); document.body.classList.add('locked');
       }
-
       function closePopup() {
         const sheet = document.getElementById('addSheet');
-        document.getElementById('overlay').classList.remove('open');
-        sheet.classList.remove('open');
-        document.body.classList.remove('locked');
+        document.getElementById('overlay').classList.remove('open'); sheet.classList.remove('open'); document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
       }
-
       function renderColorRow() {
-        const row = document.getElementById('colorRow');
-        row.innerHTML = COLORS.map(c => `
-    <div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; 
-      border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};"
-      onclick="pickColor('${c.cls}')"></div>`).join('');
+        document.getElementById('colorRow').innerHTML = COLORS.map(c => `<div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};" onclick="pickColor('${c.cls}')"></div>`).join('');
       }
-
       function pickColor(cls) { selectedColor = cls; renderColorRow(); }
-
       function submitAdd() {
-        const titleInput = document.getElementById('inputTitle');
-        const errorMsg = document.getElementById('titleError');
-        const title = titleInput.value.trim();
-        const h = document.getElementById('selHour').value;
-        const m = document.getElementById('selMin').value;
+        const title = document.getElementById('inputTitle').value.trim();
+        const h = document.getElementById('selHour').value; const m = document.getElementById('selMin').value;
         const finalDate = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, m, 0, 0);
-
-        if (!title) {
-          titleInput.classList.add('error');
-          errorMsg.style.display = 'block';
-          return;
-        }
-        if (finalDate <= new Date()) { alert('미래의 시간을 선택해주세요.'); return; }
-
-        const data = getData();
-        data.push({ title, date: finalDate.toISOString(), color: selectedColor });
-        saveData(data);
-        closePopup();
-        render();
+        if (!title) { document.getElementById('titleError').style.display = 'block'; return; }
+        const data = getData(); data.push({ title, date: finalDate.toISOString(), color: selectedColor }); saveData(data);
+        closePopup(); render();
       }
+      function hideError() { document.getElementById('titleError').style.display = 'none'; }
 
-      function hideError() {
-        document.getElementById('inputTitle').classList.remove('error');
-        document.getElementById('titleError').style.display = 'none';
-      }
-
-      // ===== SLOT MACHINE =====
       const prevDigits = {};
       function slotRender(el, value, key) {
-        const str = String(value).padStart(2, '0');
-        const prev = prevDigits[key] || str;
-        prevDigits[key] = str;
+        const str = String(value).padStart(2, '0'); const prev = prevDigits[key] || str; prevDigits[key] = str;
         let html = '<div class="slot-container">';
         for (let i = 0; i < str.length; i++) {
-          const d = str[i];
-          const p = prev[i];
-          if (d === p) {
-            html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
-          } else {
-            html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
-          }
+          const d = str[i], p = prev[i];
+          if (d === p) html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
+          else html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
         }
-        html += '</div>';
-        el.innerHTML = html;
+        html += '</div>'; el.innerHTML = html;
       }
 
-      // ===== RENDER LIST =====
       function calcDiff(dateStr) {
-        const diff = new Date(dateStr) - new Date();
-        if (diff <= 0) return null;
+        const diff = new Date(dateStr) - new Date(); if (diff <= 0) return null;
         const s = Math.floor(diff / 1000);
         return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
       }
 
       function render() {
-        const data = getData();
-        const list = document.getElementById('cardList');
-        const empty = document.getElementById('emptyState');
-        const cnt = document.getElementById('sectionCount');
-
-        list.innerHTML = '';
-        cnt.textContent = `${data.length}개`;
+        const data = getData(); const list = document.getElementById('cardList'); const empty = document.getElementById('emptyState');
+        list.innerHTML = ''; document.getElementById('sectionCount').textContent = `${data.length}개`;
         if (!data.length) { empty.style.display = 'block'; document.getElementById('bannerCard').style.display = 'none'; return; }
-        empty.style.display = 'none';
-        document.getElementById('bannerCard').style.display = 'flex';
-
+        empty.style.display = 'none'; document.getElementById('bannerCard').style.display = 'flex';
         data.forEach((item, i) => {
           const colorObj = COLORS.find(c => c.cls === item.color) || COLORS[0];
-          const card = document.createElement('div');
-          card.className = `card ${item.color}`;
-          card.style.animationDelay = `${i * 0.05}s`;
-          card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-dot" style="background:${colorObj.hex}"></div>
-        <div class="card-top">
-          <div class="card-title">${escHtml(item.title)}</div>
-          <button style="width:32px; height:32px; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="toggleMenu(event,${i})">
-            <img src="more.svg" alt="More" style="width:24px; height:24px;">
-          </button>
-          <div class="overflow-menu" id="menu${i}">
-            <div class="overflow-item" onclick="goDetail(${i})">수정</div>
-            <div class="overflow-item" style="color:var(--danger)" onclick="deleteConfirm(event,${i})">삭제</div>
-          </div>
-        </div>
-        <div class="card-dday-row">
-          <span class="card-d-prefix">D-</span>
-          <span class="card-d-num" id="dnum${i}" style="color:${colorObj.hex}"></span>
-        </div>
-        <div class="card-hms" id="hms${i}"></div>
-        <div class="card-date" style="margin-top:12px; font-size:12px; color:var(--text-tertiary)">${formatDateSimple(item.date)}</div>
-      </div>`;
-          card.onclick = (e) => { if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) goDetail(i); };
-          list.appendChild(card);
-          updateCardTime(i, item.date);
+          const card = document.createElement('div'); card.className = 'card';
+          card.innerHTML = `<div class="card-inner">
+            <div class="card-dot" style="background:${colorObj.hex}"></div>
+            <div class="card-top"><div class="card-title">${escHtml(item.title)}</div><button style="background:none; border:none; cursor:pointer;" onclick="toggleMenu(event,${i})"><img src="more.svg" style="width:24px;"></button>
+            <div class="overflow-menu" id="menu${i}"><div class="overflow-item" onclick="goDetail(${i})">수정</div><div class="overflow-item" style="color:var(--danger)" onclick="deleteConfirm(event,${i})">삭제</div></div></div>
+            <div style="display:flex; align-items:baseline; gap:4px;"><span style="font-size:18px; font-weight:700; color:var(--text-secondary);">D-</span><span class="card-d-num" id="dnum${i}" style="color:${colorObj.hex}"></span></div>
+            <div class="card-hms" id="hms${i}"></div></div>`;
+          card.onclick = (e) => { if (!e.target.closest('.overflow-menu') && !e.target.closest('button')) goDetail(i); };
+          list.appendChild(card); updateCardTime(i, item.date);
         });
         renderBanner();
       }
 
-      function formatDateSimple(dateStr) {
-        const d = new Date(dateStr);
-        return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-      }
-
       function updateCardTime(i, dateStr) {
-        const t = calcDiff(dateStr);
-        const numEl = document.getElementById(`dnum${i}`);
-        const hmsEl = document.getElementById(`hms${i}`);
+        const t = calcDiff(dateStr); const numEl = document.getElementById(`dnum${i}`); const hmsEl = document.getElementById(`hms${i}`);
         if (!numEl) return;
         if (t) {
           numEl.textContent = t.d;
-          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초 남음</div>`;
-          slotRender(document.getElementById(`h${i}`), t.h, `h${i}`);
-          slotRender(document.getElementById(`m${i}`), t.m, `m${i}`);
-          slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
-        } else {
-          numEl.textContent = 'Day';
-          hmsEl.textContent = '종료된 로그입니다.';
-        }
+          hmsEl.innerHTML = `<div><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초 남음</div>`;
+          slotRender(document.getElementById(`h${i}`), t.h, `h${i}`); slotRender(document.getElementById(`m${i}`), t.m, `m${i}`); slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
+        } else { numEl.textContent = 'Day'; hmsEl.textContent = '종료된 로그입니다.'; }
       }
 
       function renderBanner() {
-        const data = getData();
-        const bc = document.getElementById('bannerContent');
-        if (!data.length) return;
-        const item = data[0];
-        const t = calcDiff(item.date);
-        bc.innerHTML = `
-    <div class="banner-title">${escHtml(item.title)}</div>
-    <div class="banner-dday">D-${t ? t.d : 'Day'}</div>
-  `;
+        const data = getData(); if (!data.length) return;
+        const item = data[0]; const t = calcDiff(item.date);
+        document.getElementById('bannerContent').innerHTML = `<div class="banner-title">${escHtml(item.title)}</div><div class="banner-dday">D-${t ? t.d : 'Day'}</div>`;
       }
 
-      function toggleMenu(e, i) {
-        e.stopPropagation();
-        const m = document.getElementById(`menu${i}`);
-        const isOpen = m.classList.contains('open');
-        document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-        if (!isOpen) m.classList.add('open');
-      }
-
-      function deleteConfirm(e, i) {
-        e.stopPropagation();
-        deleteIdx = i;
-        document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-        document.getElementById('delOverlay').classList.add('open');
-        document.getElementById('delSheet').classList.add('open');
-        document.body.classList.add('locked');
-      }
-
-      function closeDelPopup() {
-        const sheet = document.getElementById('delSheet');
-        document.getElementById('delOverlay').classList.remove('open');
-        sheet.classList.remove('open');
-        document.body.classList.remove('locked');
-        setTimeout(() => sheet.style.transform = '', 300);
-      }
-
-      document.getElementById('confirmDelBtn').onclick = () => {
-        const data = getData();
-        data.splice(deleteIdx, 1);
-        saveData(data);
-        closeDelPopup();
-        render();
-        showNotif('D-Day 가 삭제되었어요');
-      };
-
-      function showNotif(msg) {
-        const n = document.getElementById('notif');
-        n.querySelector('span').textContent = msg;
-        n.classList.add('show');
-        setTimeout(() => n.classList.remove('show'), 3000);
-      }
-
-      // Check for pending notifications
-      const lastNotif = localStorage.getItem('lastNotif');
-      if (lastNotif) {
-        setTimeout(() => {
-          showNotif(lastNotif);
-          localStorage.removeItem('lastNotif');
-        }, 500);
-      }
-
-      function goDetail(i) {
-        localStorage.setItem('ddayIndex', i);
-        location.href = 'detail.html';
-      }
-
+      function toggleMenu(e, i) { e.stopPropagation(); const m = document.getElementById(`menu${i}`); const isOpen = m.classList.contains('open'); document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')); if (!isOpen) m.classList.add('open'); }
+      function deleteConfirm(e, i) { e.stopPropagation(); deleteIdx = i; document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')); document.getElementById('delOverlay').classList.add('open'); document.getElementById('delSheet').classList.add('open'); document.body.classList.add('locked'); }
+      function closeDelPopup() { document.getElementById('delOverlay').classList.remove('open'); document.getElementById('delSheet').classList.remove('open'); document.body.classList.remove('locked'); }
+      document.getElementById('confirmDelBtn').onclick = () => { const data = getData(); data.splice(deleteIdx, 1); saveData(data); closeDelPopup(); render(); showNotif('D-Day 가 삭제되었어요'); };
+      function showNotif(msg) { const n = document.getElementById('notif'); n.querySelector('span').textContent = msg; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3000); }
+      function goDetail(i) { localStorage.setItem('ddayIndex', i); location.href = 'detail.html'; }
       function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
       document.addEventListener('click', () => document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')));
 
-      setInterval(() => {
-        const data = getData();
-        data.forEach((item, i) => updateCardTime(i, item.date));
-      }, 1000);
-
-      render();
-      setHeaderDate();
-
-      function setHeaderDate() {
-        const d = new Date();
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        document.getElementById('headerSub').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]}) · 오늘도 힘차게! 🚀`;
-      }
-
-      // ===== DRAG TO CLOSE =====
       function makeDraggable(sheetId, closeFn) {
-        const sheet = document.getElementById(sheetId);
-        const handle = sheet.querySelector('.popup-handle');
-        if (!handle) return;
-        
-        let startY = 0;
-        let currentY = 0;
-        let isDragging = false;
-
-        handle.addEventListener('touchstart', (e) => {
-          startY = e.touches[0].clientY;
-          isDragging = true;
-          sheet.style.transition = 'none';
-        }, { passive: true });
-
-        handle.addEventListener('touchmove', (e) => {
-          if (!isDragging) return;
-          currentY = e.touches[0].clientY;
-          const diff = currentY - startY;
-          if (diff > 0) {
-            sheet.style.transform = `translateY(${diff}px)`;
-          }
-        }, { passive: true });
-
-        handle.addEventListener('touchend', () => {
-          if (!isDragging) return;
-          isDragging = false;
-          sheet.style.transition = '';
-          const diff = currentY - startY;
-          if (diff > 100) {
-            closeFn();
-          } else {
-            sheet.style.transform = '';
-          }
-          startY = 0;
-          currentY = 0;
-        });
+        const sheet = document.getElementById(sheetId); const handle = sheet.querySelector('.popup-handle'); if (!handle) return;
+        let startY = 0, currentY = 0, isDragging = false;
+        handle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; sheet.style.transition = 'none'; }, { passive: true });
+        handle.addEventListener('touchmove', (e) => { if (!isDragging) return; currentY = e.touches[0].clientY; const diff = currentY - startY; if (diff > 0) sheet.style.transform = `translateY(${diff}px)`; }, { passive: true });
+        handle.addEventListener('touchend', () => { if (!isDragging) return; isDragging = false; sheet.style.transition = ''; if (currentY - startY > 100) closeFn(); else sheet.style.transform = ''; startY = 0; currentY = 0; });
       }
-
-      makeDraggable('addSheet', closePopup);
-      makeDraggable('delSheet', closeDelPopup);
+      makeDraggable('addSheet', closePopup); makeDraggable('delSheet', closeDelPopup);
+      render(); setInterval(() => { const data = getData(); data.forEach((item, i) => updateCardTime(i, item.date)); }, 1000);
+      const d = new Date(); const days = ['일', '월', '화', '수', '목', '금', '토'];
+      document.getElementById('headerSub').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]}) · 오늘도 힘차게! 🚀`;
     </script>
 </body>
-
 </html>
