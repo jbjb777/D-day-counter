@@ -193,17 +193,15 @@
       margin-top: 32px;
     }
 
-    /* Full screen: remove app margins/padding to prevent scroll */
     body.fs-active .app {
       max-width: 100%;
       padding: 0;
       margin: 0;
     }
 
-    body.fs-active .page-wrapper {
-      min-height: 100vh;
-      overflow: hidden;
-    }
+    /* Popups must be above fs-overlay (2000) */
+    .popup-overlay { z-index: 3000; }
+    .popup-sheet { z-index: 3001; }
   </style>
 </head>
 
@@ -278,7 +276,7 @@
       <div style="margin-bottom: 24px;">
         <label
           style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
-        <input class="input" id="editTitle" type="text" maxlength="20" oninput="hideError()">
+        <input class="input" id="editTitle" type="text" placeholder="어떤 일인가요?" maxlength="20" oninput="hideError()">
         <div id="titleError" class="error-msg">제목을 입력해 주세요</div>
       </div>
 
@@ -536,7 +534,7 @@
         const sheet = document.getElementById('editSheet');
         document.getElementById('overlay').classList.remove('open');
         sheet.classList.remove('open');
-        document.body.classList.remove('locked');
+        if (!isFullScreen) document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
       }
 
@@ -593,7 +591,7 @@
         const sheet = document.getElementById('delSheet');
         document.getElementById('delOverlay').classList.remove('open');
         sheet.classList.remove('open');
-        document.body.classList.remove('locked');
+        if (!isFullScreen) document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
       }
 
