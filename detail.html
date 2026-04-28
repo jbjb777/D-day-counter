@@ -3,69 +3,202 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>로그 상세 : D-Log</title>
+  <title>로그 : D-Log</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="./logo.png">
   <style>
-    .app { max-width: 600px; margin: 0 auto; padding: 20px 0 100px; }
-    .nav { padding: 20px; display: flex; align-items: center; gap: 16px; }
-    .nav-back { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .nav-back img { width: 24px; height: 24px; }
-    .nav-title { font-size: 18px; font-weight: 700; }
-    
-    .hero { margin: 0 20px 24px; background: var(--surface); border-radius: 24px; padding: 40px 30px; display: flex; flex-direction: column; align-items: flex-start; position: relative; }
-    .hero-category { font-size: 13px; font-weight: 700; color: var(--cat); margin-bottom: 12px; }
-    .hero-title { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 24px; line-height: 1.3; }
-    .hero-dday-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 12px; }
-    .hero-prefix { font-size: 24px; font-weight: 700; color: var(--text-secondary); }
-    .hero-num { font-size: 72px; font-weight: 800; color: var(--cat); letter-spacing: -3px; }
-    .hero-hms { display: flex; gap: 16px; }
-    .hero-hms-item { text-align: left; }
-    .hero-hms-num { font-size: 24px; font-weight: 800; color: var(--text-primary); }
-    .hero-hms-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-top: 2px; }
-    
-    .btn-max { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: none; background: var(--surface2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .btn-max img { width: 20px; height: 20px; opacity: 0.6; }
-    
-    .info-section { margin: 0 20px 32px; }
-    .info-row { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--surface2); align-items: center; }
-    .info-row:last-child { border-bottom: none; }
-    .info-key { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
-    .info-val { font-size: 14px; color: var(--text-primary); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .info-val img { width: 16px; height: 16px; }
-    
-    .action-section { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-    .btn-full { width: 100%; height: 56px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 15px; }
-    .btn-ghost { background: var(--surface); color: var(--text-secondary); }
-    .btn-danger { background: var(--danger-light); color: var(--danger); }
-    .btn-primary { background: var(--accent); color: white; }
+    .app {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px 0 100px;
+    }
 
-    /* Calendar Picker Styles */
-    .calendar-wrap { background: var(--surface); border-radius: 14px; padding: 20px; margin-top: 10px; }
-    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .cal-month { font-size: 16px; font-weight: 700; }
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-    .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 12px; cursor: pointer; }
-    .cal-date.selected { background: var(--accent); color: white; font-weight: 700; }
-    .cal-date.disabled { opacity: 0.2; pointer-events: none; }
-    
-    .input { width: 100%; padding: 16px; background: var(--surface); border: 1px solid transparent; border-radius: 14px; font-size: 15px; outline: none; transition: 0.2s; }
-    .input:focus { background: white; border-color: var(--accent); }
-    .error-msg { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
+    .nav {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
 
-    /* Slot Machine */
-    .slot-container { display: inline-flex; overflow: hidden; height: 1.2em; vertical-align: bottom; }
-    .slot-digit { position: relative; overflow: hidden; height: 1.2em; width: 0.65em; text-align: center; }
-    .slot-inner { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; animation: slotRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .slot-num { height: 1.2em; line-height: 1.2em; }
-    @keyframes slotRoll { from { transform: translateY(0); } to { transform: translateY(-1.2em); } }
+    .nav-back {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-back img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .nav-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .hero {
+      margin: 0 20px 24px;
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      position: relative;
+    }
+
+    .hero-category {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cat);
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
+
+    .hero-dday-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .hero-prefix {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .hero-num {
+      font-size: 72px;
+      font-weight: 800;
+      color: var(--cat);
+      letter-spacing: -3px;
+    }
+
+    .hero-hms {
+      display: flex;
+      gap: 16px;
+    }
+
+    .hero-hms-item {
+      text-align: left;
+    }
+
+    .hero-hms-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .hero-hms-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .btn-max {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--surface2);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .btn-max:hover {
+      background: var(--border-dark);
+    }
+
+    .btn-max img {
+      width: 20px;
+      height: 20px;
+      opacity: 0.6;
+    }
+
+    .info-section {
+      margin: 0 20px 32px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--surface2);
+      align-items: center;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-key {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .info-val {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-val img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .action-section {
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-full {
+      width: 100%;
+      height: 56px;
+      border-radius: var(--radius);
+    }
+
+    .popup-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 32px;
+    }
   </style>
 </head>
 
 <body>
   <div class="page-wrapper">
     <div class="app">
+
       <div class="nav">
         <button class="nav-back" onclick="location.href='index.html'">
           <img src="back.svg" alt="Back">
@@ -85,29 +218,42 @@
       </div>
 
       <div class="action-section">
-        <button class="btn-full btn-ghost" onclick="openEdit()">수정하기</button>
-        <button class="btn-full btn-danger" onclick="openDeleteConfirm()">삭제하기</button>
+        <button class="btn btn-ghost btn-full" onclick="openEdit()">수정하기</button>
+        <button class="btn btn-danger btn-full" onclick="openDeleteConfirm()">삭제하기</button>
       </div>
 
       <footer class="footer">
-        <img src="jb.png" alt="JB" class="footer-logo">
-        <span style="font-size:14px; font-weight:700; color:var(--text-secondary);">JBJB</span>
-        <div style="margin-top:12px;"><a href="https://jbjb777.github.io" class="footer-link">자세히 알아보기</a></div>
+        <span class="footer-label">제작자 정보</span>
+        <div class="footer-main">
+          <img src="jb.png" alt="JB" class="footer-logo">
+          <span class="footer-name">JBJB</span>
+        </div>
+        <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
       </footer>
+
     </div>
 
-    <!-- Full Screen -->
+    <!-- Full Screen Overlay -->
     <div class="fs-overlay" id="fsOverlay">
       <div class="fs-content">
         <div class="fs-dday" id="fsDday">D-0</div>
         <div class="fs-hms">
-          <div class="fs-hms-item"><div class="fs-hms-num" id="fsH"></div><div class="fs-hms-label">시간</div></div>
-          <div class="fs-hms-item"><div class="fs-hms-num" id="fsM"></div><div class="fs-hms-label">분</div></div>
-          <div class="fs-hms-item"><div class="fs-hms-num" id="fsS"></div><div class="fs-hms-label">초</div></div>
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsH"></div>
+            <div class="fs-hms-label">시간</div>
+          </div>
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsM"></div>
+            <div class="fs-hms-label">분</div>
+          </div>
+          <div class="fs-hms-item">
+            <div class="fs-hms-num" id="fsS"></div>
+            <div class="fs-hms-label">초</div>
+          </div>
         </div>
       </div>
       <button class="exit-fs-btn" id="exitFsBtn" onclick="toggleFullScreen(false)">
-        <img src="min.svg" alt="Minimize" style="width:24px; opacity:0.6;">
+        <img src="min.svg" alt="Minimize">
       </button>
     </div>
 
@@ -115,55 +261,69 @@
     <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
     <div class="popup-sheet" id="editSheet">
       <div class="popup-handle"></div>
-      <div style="font-size:20px; font-weight:700; margin-bottom:24px;">로그 수정</div>
-      
+      <div class="popup-title">로그 수정</div>
+
       <div style="margin-bottom: 24px;">
-        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
+        <label
+          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
         <input class="input" id="editTitle" type="text" maxlength="20" oninput="hideError()">
         <div id="titleError" class="error-msg">제목을 입력해 주세요</div>
       </div>
 
       <div style="margin-bottom: 24px;">
-        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜 및 시간</label>
+        <label
+          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜
+          및 시간</label>
         <div class="calendar-wrap">
           <div class="cal-header">
-            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(-1)"><img src="back.svg" style="width:20px;"></button>
+            <button class="cal-btn" onclick="changeMonth(-1)"><img src="back.svg"></button>
             <div class="cal-month" id="calMonth"></div>
-            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(1)"><img src="back.svg" style="width:20px; transform:scaleX(-1);"></button>
+            <button class="cal-btn next" onclick="changeMonth(1)"><img src="back.svg"></button>
           </div>
-          <div class="cal-grid" id="calGrid"></div>
-          <div style="display:flex; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--surface2);">
-            <div style="flex:1;"><select class="input" id="editHour" style="padding:10px;"></select></div>
-            <div style="flex:1;"><select class="input" id="editMin" style="padding:10px;"></select></div>
+          <div id="calGridContainer" style="overflow: hidden;">
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+          <div class="time-picker">
+            <div class="time-col">
+              <label class="time-label">시간</label>
+              <select class="time-select" id="editHour"></select>
+            </div>
+            <div class="time-col">
+              <label class="time-label">분</label>
+              <select class="time-select" id="editMin"></select>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="margin-bottom:32px;">
-        <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
+      <div>
+        <label
+          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
         <div id="editColorRow" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <button class="btn-full btn-ghost" onclick="closePopup()">취소</button>
-        <button class="btn-full btn-primary" onclick="submitEdit()">저장하기</button>
+      <div class="popup-actions">
+        <button class="btn btn-ghost" onclick="closePopup()">취소</button>
+        <button class="btn btn-primary" onclick="submitEdit()">저장하기</button>
       </div>
     </div>
 
-    <!-- Delete popup -->
+    <!-- Delete confirm popup -->
     <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
-    <div class="popup-sheet" id="delSheet" style="text-align: center;">
-      <div class="popup-handle"></div>
-      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px;"></div>
-      <div style="font-size:20px; font-weight:700; margin-bottom:8px;">정말 삭제할까요?</div>
+    <div class="popup-sheet" id="delSheet" style="text-align: center; padding-top: 40px;">
+      <div style="margin-bottom: 20px;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
+      <div class="popup-title" style="margin-bottom: 8px;">정말 삭제할까요?</div>
       <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14px;">삭제된 로그는 복구할 수 없습니다.</p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <button class="btn-full btn-ghost" onclick="closeDelPopup()">취소</button>
-        <button class="btn-full btn-primary" style="background:var(--danger);" onclick="confirmDelete()">삭제</button>
+      <div class="popup-actions">
+        <button class="btn btn-ghost" onclick="closeDelPopup()">취소</button>
+        <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">삭제</button>
       </div>
     </div>
 
-    <div class="notif-banner" id="notif"><span>D-Day 가 수정되었어요</span></div>
+    <!-- Notification -->
+    <div class="notif-banner" id="notif">
+      <span>D-Day 가 수정되었어요</span>
+    </div>
 
     <script>
       const COLORS = [
@@ -175,158 +335,310 @@
         { cls: 'cat-red', hex: '#F04452' },
         { cls: 'cat-teal', hex: '#00C7BE' },
       ];
+
       let idx = parseInt(localStorage.getItem('ddayIndex') || '0');
       let selectedColor = 'cat-blue';
       let curViewDate = new Date();
       let selDate = new Date();
       let isFullScreen = false;
       let fsTimer = null;
-      const prevDigits = {};
 
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
       function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
       function getItem() { return getData()[idx]; }
 
+      // ===== SLOT MACHINE =====
+      const prevDigits = {};
       function slotRender(el, value, key) {
         const str = String(value).padStart(2, '0');
         const prev = prevDigits[key] || str;
         prevDigits[key] = str;
         let html = '<div class="slot-container">';
         for (let i = 0; i < str.length; i++) {
-          const d = str[i], p = prev[i];
-          if (d === p) html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
-          else html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
+          const d = str[i];
+          const p = prev[i];
+          if (d === p) {
+            html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
+          } else {
+            html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
+          }
         }
-        html += '</div>'; el.innerHTML = html;
+        html += '</div>';
+        el.innerHTML = html;
       }
 
+      // ===== RENDER =====
       function renderPage() {
-        const item = getItem(); if (!item) { location.href = 'index.html'; return; }
+        const item = getItem();
+        if (!item) { location.href = 'index.html'; return; }
         const colorObj = COLORS.find(c => c.cls === item.color) || COLORS[0];
         document.documentElement.style.setProperty('--cat', colorObj.hex);
+
         const t = calcDiff(item.date);
         const hero = document.getElementById('heroContent');
         hero.innerHTML = `
           <div class="hero-category">UPCOMING EVENT</div>
           <div class="hero-title">${escHtml(item.title)}</div>
-          <div class="hero-dday-row"><span class="hero-prefix">D-</span><span class="hero-num">${t ? t.d : 'Day'}</span></div>
+          <div class="hero-dday-row">
+            <span class="hero-prefix">D-</span>
+            <span class="hero-num" id="heroNum">${t ? t.d : 'Day'}</span>
+          </div>
           <div class="hero-hms">
             <div class="hero-hms-item"><div class="hero-hms-num" id="hH"></div><div class="hero-hms-label">시간</div></div>
             <div class="hero-hms-item"><div class="hero-hms-num" id="hM"></div><div class="hero-hms-label">분</div></div>
             <div class="hero-hms-item"><div class="hero-hms-num" id="hS"></div><div class="hero-hms-label">초</div></div>
           </div>`;
+
         if (t) {
-          slotRender(document.getElementById('hH'), t.h, 'hH'); slotRender(document.getElementById('hM'), t.m, 'hM'); slotRender(document.getElementById('hS'), t.s, 'hS');
+          slotRender(document.getElementById('hH'), t.h, 'hH');
+          slotRender(document.getElementById('hM'), t.m, 'hM');
+          slotRender(document.getElementById('hS'), t.s, 'hS');
+
           if (isFullScreen) {
             document.getElementById('fsDday').textContent = `D-${t.d}`;
-            slotRender(document.getElementById('fsH'), t.h, 'fsH'); slotRender(document.getElementById('fsM'), t.m, 'fsM'); slotRender(document.getElementById('fsS'), t.s, 'fsS');
+            slotRender(document.getElementById('fsH'), t.h, 'fsH');
+            slotRender(document.getElementById('fsM'), t.m, 'fsM');
+            slotRender(document.getElementById('fsS'), t.s, 'fsS');
           }
+        } else {
+          document.querySelectorAll('.hero-hms-num').forEach(el => el.textContent = '00');
+          if (isFullScreen) document.getElementById('fsDday').textContent = 'D-Day';
         }
+
+        const statusText = t ? '진행 중' : '완료';
+        const statusIcon = t ? 'time.svg' : 'ok.svg';
+
         document.getElementById('infoRows').innerHTML = `
           <div class="info-row"><span class="info-key">날짜</span><span class="info-val">${formatDateFull(item.date)}</span></div>
           <div class="info-row"><span class="info-key">구분</span><span class="info-val" style="color:${colorObj.hex}">${item.title}</span></div>
-          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${t ? '진행 중' : '완료'} <img src="${t ? 'time.svg' : 'ok.svg'}" style="width:16px;"></span></div>`;
+          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${statusText} <img src="${statusIcon}"></span></div>`;
       }
 
       function calcDiff(dateStr) {
-        const diff = new Date(dateStr) - new Date(); if (diff <= 0) return null;
+        const diff = new Date(dateStr) - new Date();
+        if (diff <= 0) return null;
         const s = Math.floor(diff / 1000);
         return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
       }
+
       function formatDateFull(dateStr) {
         const d = new Date(dateStr);
         return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
       }
 
+      // ===== FULL SCREEN =====
       function toggleFullScreen(on) {
         isFullScreen = on;
         const overlay = document.getElementById('fsOverlay');
-        if (on) { overlay.classList.add('open'); document.body.classList.add('locked'); resetFsTimer(); }
-        else { overlay.classList.remove('open'); document.body.classList.remove('locked'); clearTimeout(fsTimer); }
+        const btn = document.getElementById('exitFsBtn');
+        if (on) {
+          overlay.classList.add('open');
+          document.body.classList.add('locked');
+          resetFsTimer();
+        } else {
+          overlay.classList.remove('open');
+          document.body.classList.remove('locked');
+          clearTimeout(fsTimer);
+        }
         renderPage();
       }
+
       function resetFsTimer() {
-        const btn = document.getElementById('exitFsBtn'); btn.classList.remove('hide');
-        clearTimeout(fsTimer); fsTimer = setTimeout(() => { if (isFullScreen) btn.classList.add('hide'); }, 1500);
+        const btn = document.getElementById('exitFsBtn');
+        btn.classList.remove('hide');
+        clearTimeout(fsTimer);
+        fsTimer = setTimeout(() => {
+          if (isFullScreen) btn.classList.add('hide');
+        }, 1500);
       }
 
+      document.getElementById('fsOverlay').addEventListener('mousedown', () => {
+        if (isFullScreen) resetFsTimer();
+      });
+      document.getElementById('fsOverlay').addEventListener('touchstart', () => {
+        if (isFullScreen) resetFsTimer();
+      });
+
+      // ===== CALENDAR =====
       function initPicker(existingDate) {
-        const h = document.getElementById('editHour'); const m = document.getElementById('editMin');
+        const h = document.getElementById('editHour');
+        const m = document.getElementById('editMin');
         h.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}시</option>`).join('');
         m.innerHTML = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}분</option>`).join('');
-        const d = new Date(existingDate); curViewDate = new Date(d); selDate = new Date(d); selDate.setHours(0, 0, 0, 0);
-        h.value = d.getHours(); m.value = d.getMinutes(); renderCalendar();
+        const d = new Date(existingDate);
+        curViewDate = new Date(d);
+        selDate = new Date(d); selDate.setHours(0, 0, 0, 0);
+        h.value = d.getHours();
+        m.value = d.getMinutes();
+        renderCalendar();
       }
+
       function renderCalendar() {
-        const grid = document.getElementById('calGrid'); const monLabel = document.getElementById('calMonth');
-        const y = curViewDate.getFullYear(); const m = curViewDate.getMonth(); monLabel.textContent = `${y}년 ${m + 1}월`;
-        const first = new Date(y, m, 1).getDay(); const last = new Date(y, m + 1, 0).getDate();
-        let html = ''; for (let i = 0; i < first; i++) html += '<div></div>';
+        const grid = document.getElementById('calGrid');
+        const monLabel = document.getElementById('calMonth');
+        const y = curViewDate.getFullYear();
+        const m = curViewDate.getMonth();
+        monLabel.textContent = `${y}년 ${m + 1}월`;
+        const first = new Date(y, m, 1).getDay();
+        const last = new Date(y, m + 1, 0).getDate();
+        let html = ['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
+        for (let i = 0; i < first; i++) html += '<div></div>';
         const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 1; i <= last; i++) {
-          const d = new Date(y, m, i); const isSel = d.getTime() === selDate.getTime();
-          html += `<div class="cal-date ${isSel ? 'selected' : ''} ${d.getTime() === today.getTime() ? 'today' : ''} ${d.getTime() < today.getTime() ? 'disabled' : ''}" onclick="pickDate(${y},${m},${i})">${i}</div>`;
+          const d = new Date(y, m, i);
+          const isSel = d.getTime() === selDate.getTime();
+          const isToday = d.getTime() === today.getTime();
+          const isPast = d.getTime() < today.getTime();
+          html += `<div class="cal-date ${isSel ? 'selected' : ''} ${isToday ? 'today' : ''} ${isPast ? 'disabled' : ''}" 
+              onclick="pickDate(${y},${m},${i})">${i}</div>`;
         }
         grid.innerHTML = html;
       }
-      function changeMonth(dir) { curViewDate.setMonth(curViewDate.getMonth() + dir); renderCalendar(); }
+
+      function changeMonth(dir) {
+        const grid = document.getElementById('calGrid');
+        grid.classList.remove('slide-left', 'slide-right');
+        void grid.offsetWidth;
+        grid.classList.add(dir > 0 ? 'slide-left' : 'slide-right');
+        curViewDate.setMonth(curViewDate.getMonth() + dir);
+        renderCalendar();
+      }
+
       function pickDate(y, m, d) { selDate = new Date(y, m, d, 0, 0, 0, 0); renderCalendar(); }
 
+      // ===== ACTIONS =====
       function openEdit() {
-        const item = getItem(); document.getElementById('editTitle').value = item.title;
-        selectedColor = item.color || 'cat-blue'; initPicker(item.date); renderEditColorRow();
-        document.getElementById('overlay').classList.add('open'); document.getElementById('editSheet').classList.add('open'); document.body.classList.add('locked');
+        const item = getItem();
+        document.getElementById('editTitle').value = item.title;
+        selectedColor = item.color || 'cat-blue';
+        initPicker(item.date);
+        renderEditColorRow();
+        document.getElementById('overlay').classList.add('open');
+        document.getElementById('editSheet').classList.add('open');
+        document.body.classList.add('locked');
       }
+
       function closePopup() {
         const sheet = document.getElementById('editSheet');
-        document.getElementById('overlay').classList.remove('open'); sheet.classList.remove('open'); document.body.classList.remove('locked');
+        document.getElementById('overlay').classList.remove('open');
+        sheet.classList.remove('open');
+        document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
       }
+
       function renderEditColorRow() {
-        document.getElementById('editColorRow').innerHTML = COLORS.map(c => `<div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};" onclick="pickColor('${c.cls}')"></div>`).join('');
+        const row = document.getElementById('editColorRow');
+        row.innerHTML = COLORS.map(c => `
+    <div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; 
+      border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};"
+      onclick="pickColor('${c.cls}')"></div>`).join('');
       }
+
       function pickColor(cls) { selectedColor = cls; renderEditColorRow(); }
+
       function submitEdit() {
-        const title = document.getElementById('editTitle').value.trim();
-        const h = document.getElementById('editHour').value; const m = document.getElementById('editMin').value;
+        const titleInput = document.getElementById('editTitle');
+        const errorMsg = document.getElementById('titleError');
+        const title = titleInput.value.trim();
+        const h = document.getElementById('editHour').value;
+        const m = document.getElementById('editMin').value;
         const finalDate = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, m, 0, 0);
-        if (!title) { document.getElementById('titleError').style.display = 'block'; return; }
-        const data = getData(); data[idx] = { title, date: finalDate.toISOString(), color: selectedColor }; saveData(data);
-        closePopup(); renderPage(); showNotif('D-Day 가 수정되었어요');
+
+        if (!title) {
+          titleInput.classList.add('error');
+          errorMsg.style.display = 'block';
+          return;
+        }
+        const data = getData();
+        data[idx] = { title, date: finalDate.toISOString(), color: selectedColor };
+        saveData(data);
+        closePopup();
+        renderPage();
+        showNotif('D-Day 가 수정되었어요');
       }
-      function hideError() { document.getElementById('titleError').style.display = 'none'; }
+
+      function hideError() {
+        document.getElementById('editTitle').classList.remove('error');
+        document.getElementById('titleError').style.display = 'none';
+      }
+
       function showNotif(msg) {
-        const n = document.getElementById('notif'); n.querySelector('span').textContent = msg; n.classList.add('show');
+        const n = document.getElementById('notif');
+        n.querySelector('span').textContent = msg;
+        n.classList.add('show');
         setTimeout(() => n.classList.remove('show'), 3000);
       }
-      function openDeleteConfirm() { document.getElementById('delOverlay').classList.add('open'); document.getElementById('delSheet').classList.add('open'); document.body.classList.add('locked'); }
+
+      function openDeleteConfirm() {
+        document.getElementById('delOverlay').classList.add('open');
+        document.getElementById('delSheet').classList.add('open');
+        document.body.classList.add('locked');
+      }
+
       function closeDelPopup() {
         const sheet = document.getElementById('delSheet');
-        document.getElementById('delOverlay').classList.remove('open'); sheet.classList.remove('open'); document.body.classList.remove('locked');
+        document.getElementById('delOverlay').classList.remove('open');
+        sheet.classList.remove('open');
+        document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
       }
+
       function confirmDelete() {
-        const data = getData(); data.splice(idx, 1); saveData(data);
-        localStorage.setItem('lastNotif', 'D-Day 가 삭제되었어요'); location.href = 'index.html';
+        const data = getData();
+        data.splice(idx, 1);
+        saveData(data);
+        localStorage.setItem('lastNotif', 'D-Day 가 삭제되었어요');
+        location.href = 'index.html';
       }
+
       function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
+      // ===== DRAG TO CLOSE =====
       function makeDraggable(sheetId, closeFn) {
-        const sheet = document.getElementById(sheetId); const handle = sheet.querySelector('.popup-handle'); if (!handle) return;
-        let startY = 0, currentY = 0, isDragging = false;
-        handle.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; isDragging = true; sheet.style.transition = 'none'; }, { passive: true });
-        handle.addEventListener('touchmove', (e) => {
-          if (!isDragging) return; currentY = e.touches[0].clientY;
-          const diff = currentY - startY; if (diff > 0) sheet.style.transform = `translateY(${diff}px)`;
+        const sheet = document.getElementById(sheetId);
+        const handle = sheet.querySelector('.popup-handle');
+        if (!handle) return;
+        
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        handle.addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY;
+          isDragging = true;
+          sheet.style.transition = 'none';
         }, { passive: true });
+
+        handle.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          currentY = e.touches[0].clientY;
+          const diff = currentY - startY;
+          if (diff > 0) {
+            sheet.style.transform = `translateY(${diff}px)`;
+          }
+        }, { passive: true });
+
         handle.addEventListener('touchend', () => {
-          if (!isDragging) return; isDragging = false; sheet.style.transition = '';
-          if (currentY - startY > 100) closeFn(); else sheet.style.transform = '';
-          startY = 0; currentY = 0;
+          if (!isDragging) return;
+          isDragging = false;
+          sheet.style.transition = '';
+          const diff = currentY - startY;
+          if (diff > 100) {
+            closeFn();
+          } else {
+            sheet.style.transform = '';
+          }
+          startY = 0;
+          currentY = 0;
         });
       }
-      makeDraggable('editSheet', closePopup); makeDraggable('delSheet', closeDelPopup);
-      renderPage(); setInterval(renderPage, 1000);
+
+      makeDraggable('editSheet', closePopup);
+      makeDraggable('delSheet', closeDelPopup);
+
+      renderPage();
+      setInterval(renderPage, 1000);
     </script>
 </body>
+
 </html>
