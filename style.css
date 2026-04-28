@@ -56,6 +56,15 @@ body {
   background: var(--bg);
 }
 
+body.locked {
+  overflow: hidden;
+}
+
+/* Modern body lock fallback using :has() */
+body:has(.popup-overlay.open) {
+  overflow: hidden;
+}
+
 /* ===== SCROLLBAR ===== */
 ::-webkit-scrollbar { width: 0; }
 
@@ -205,6 +214,9 @@ body {
   pointer-events: none;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  will-change: transform;
 }
 
 /* Calendar month slide */
@@ -230,10 +242,10 @@ body {
     left: 0;
     right: 0;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: 0 24px 24px;
-    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    padding: 8px 24px 24px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     transform: translateY(100%);
-    max-height: 90dvh;
+    max-height: 85dvh;
     overflow-y: auto;
   }
   .popup-sheet.open {

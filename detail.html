@@ -513,11 +513,13 @@
         renderEditColorRow();
         document.getElementById('overlay').classList.add('open');
         document.getElementById('editSheet').classList.add('open');
+        document.body.classList.add('locked');
       }
 
       function closePopup() {
         document.getElementById('overlay').classList.remove('open');
         document.getElementById('editSheet').classList.remove('open');
+        document.body.classList.remove('locked');
       }
 
       function renderEditColorRow() {
@@ -566,11 +568,13 @@
       function openDeleteConfirm() {
         document.getElementById('delOverlay').classList.add('open');
         document.getElementById('delSheet').classList.add('open');
+        document.body.classList.add('locked');
       }
 
       function closeDelPopup() {
         document.getElementById('delOverlay').classList.remove('open');
         document.getElementById('delSheet').classList.remove('open');
+        document.body.classList.remove('locked');
       }
 
       function confirmDelete() {
