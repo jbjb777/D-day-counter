@@ -192,6 +192,18 @@
       gap: 12px;
       margin-top: 32px;
     }
+
+    /* Full screen: remove app margins/padding to prevent scroll */
+    body.fs-active .app {
+      max-width: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    body.fs-active .page-wrapper {
+      min-height: 100vh;
+      overflow: hidden;
+    }
   </style>
 </head>
 
@@ -434,10 +446,12 @@
         if (on) {
           overlay.classList.add('open');
           document.body.classList.add('locked');
+          document.body.classList.add('fs-active');
           resetFsTimer();
         } else {
           overlay.classList.remove('open');
           document.body.classList.remove('locked');
+          document.body.classList.remove('fs-active');
           clearTimeout(fsTimer);
         }
         renderPage();
