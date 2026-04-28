@@ -1,0 +1,416 @@
+@import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+
+/* ===== RESET & BASE (2D Flat Theme) ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  /* Clean 2D Colors (Toss Inspired) */
+  --bg: #FFFFFF;
+  --surface: #F2F4F6;
+  --surface2: #E5E8EB;
+  --surface3: #D1D6DB;
+  --border: #F2F4F6;
+  --border-dark: #E5E8EB;
+  
+  --text-primary: #191F28;
+  --text-secondary: #4E5968;
+  --text-tertiary: #8B95A1;
+  
+  --accent: #3182F6;
+  --accent-light: #E8F3FF;
+  --danger: #F04452;
+  --danger-light: #FEECEF;
+  --success: #00BA54;
+  --warn: #FFAD13;
+
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  /* Minimal shadows for 2D look */
+  --shadow: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  position: relative;
+  background: var(--bg);
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 0; }
+
+/* ===== PAGE TRANSITIONS ===== */
+.page-wrapper {
+  min-height: 100dvh;
+  opacity: 0;
+  animation: pageIn 0.4s ease forwards;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== NOTIFICATION (Top-Down) ===== */
+.notif-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120%);
+  background: white;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  z-index: 1000;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+  pointer-events: none;
+  opacity: 0;
+}
+.notif-banner.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ===== BUTTON (2D Flat) ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.btn:active { transform: scale(0.96); opacity: 0.8; }
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+/* ===== INPUT (Flat) ===== */
+.input {
+  width: 100%;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input:focus {
+  background: white;
+  border-color: var(--accent);
+}
+
+.input.error {
+  border-color: var(--danger);
+  background: var(--danger-light);
+}
+
+.error-msg {
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+  display: none;
+  animation: errorIn 0.3s ease forwards;
+}
+
+@keyframes errorIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE POPUP (Sheet on Mobile, Modal on Desktop) ===== */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition);
+  pointer-events: none;
+}
+
+.popup-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.popup-sheet {
+  position: fixed;
+  z-index: 101;
+  background: white;
+  visibility: hidden;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* Calendar month slide */
+.cal-grid {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.cal-grid.slide-left { animation: slideLeft 0.3s ease forwards; }
+.cal-grid.slide-right { animation: slideRight 0.3s ease forwards; }
+
+@keyframes slideLeft {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideRight {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Mobile: Bottom Sheet */
+@media (max-width: 600px) {
+  .popup-sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: 0 24px 24px;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(100%);
+    max-height: 90dvh;
+    overflow-y: auto;
+  }
+  .popup-sheet.open {
+    transform: translateY(0);
+    visibility: visible;
+    pointer-events: all;
+  }
+}
+
+/* Desktop: Centered Popup */
+@media (min-width: 601px) {
+  .popup-sheet {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -45%) scale(0.95);
+    width: 400px;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    opacity: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .popup-sheet.open {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    visibility: visible;
+    pointer-events: all;
+  }
+  .popup-handle { display: none; }
+}
+
+.popup-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 99px;
+  margin: 12px auto 20px;
+}
+
+.popup-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+/* ===== CALENDAR (Clean 2D) ===== */
+.calendar-wrap {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.cal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cal-btn {
+  width: 32px; height: 32px; border: none; background: transparent;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: background 0.2s;
+}
+.cal-btn:hover { background: var(--surface2); }
+.cal-btn img { width: 20px; height: 20px; }
+.cal-btn.next img { transform: scaleX(-1); }
+
+.cal-month { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-day-label {
+  font-size: 11px; font-weight: 600; color: var(--text-tertiary);
+  text-align: center; padding-bottom: 12px;
+}
+
+.cal-date {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 500; border-radius: 12px; cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-primary);
+}
+
+.cal-date:hover { background: var(--surface2); }
+.cal-date.today { color: var(--accent); font-weight: 700; background: var(--accent-light); }
+.cal-date.selected { background: var(--accent) !important; color: white !important; font-weight: 700; }
+.cal-date.disabled { opacity: 0.15; pointer-events: none; }
+
+.time-picker {
+  display: flex; gap: 12px; margin-top: 24px;
+  padding-top: 20px; border-top: 1px solid var(--surface2);
+}
+
+.time-col { flex: 1; }
+.time-label { font-size: 11px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 8px; display: block; }
+.time-select {
+  width: 100%; padding: 12px; background: var(--surface2); border: none;
+  border-radius: var(--radius-sm); color: var(--text-primary); font-family: inherit;
+  font-size: 14px; outline: none; appearance: none;
+}
+
+/* ===== BANNER (Flat 2D) ===== */
+.banner {
+  background: var(--accent-light);
+  border-radius: var(--radius-xl);
+  min-height: 160px;
+  padding: 30px;
+  position: relative;
+  overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  border: 1px solid rgba(49, 130, 246, 0.1);
+}
+
+.banner-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
+.banner-dday { font-size: 48px; font-weight: 800; color: var(--accent); letter-spacing: -2px; }
+
+/* ===== SLOT MACHINE DIGITS ===== */
+.slot-container {
+  display: inline-flex;
+  overflow: hidden;
+  height: 1.2em;
+  vertical-align: bottom;
+}
+.slot-digit {
+  position: relative;
+  overflow: hidden;
+  height: 1.2em;
+  width: 0.65em;
+  text-align: center;
+}
+.slot-inner {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  animation: slotRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.slot-num {
+  height: 1.2em;
+  line-height: 1.2em;
+}
+
+@keyframes slotRoll {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1.2em); }
+}
+
+/* ===== OVERFLOW MENU ===== */
+.overflow-menu {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: white; border-radius: var(--radius);
+  border: 1px solid var(--surface2);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  opacity: 0; visibility: hidden;
+  transform: translateY(-8px) scale(0.95);
+  transition: all 0.2s ease;
+  z-index: 50;
+  min-width: 150px;
+}
+.overflow-menu.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.overflow-item {
+  padding: 14px 16px; font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.overflow-item:hover { background: var(--surface); }
+
+/* ===== CATEGORY COLORS (Flat) ===== */
+.cat-blue   { --cat: #3182F6; --cat-bg: #E8F3FF; }
+.cat-purple { --cat: #8B5CF6; --cat-bg: #F3E8FF; }
+.cat-pink   { --cat: #F43F5E; --cat-bg: #FFF1F2; }
+.cat-orange { --cat: #FF9500; --cat-bg: #FFF4E6; }
+.cat-green  { --cat: #00BA54; --cat-bg: #E6F8EF; }
+.cat-red    { --cat: #F04452; --cat-bg: #FEECEF; }
+.cat-yellow { --cat: #FFAD13; --cat-bg: #FFF7E6; }
+.cat-teal   { --cat: #00C7BE; --cat-bg: #E6F9F8; }
