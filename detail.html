@@ -3,12 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>로그 : D-Log</title>
+  <title>로그 상세 : D-Log</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="./logo.png">
   <style>
-    /* 상세 페이지 전용 레이아웃만 남기고 공통 스타일은 style.css 사용 */
     .app { max-width: 600px; margin: 0 auto; padding: 20px 0 100px; }
     .nav { padding: 20px; display: flex; align-items: center; gap: 16px; }
     .nav-back { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -22,10 +21,11 @@
     .hero-prefix { font-size: 24px; font-weight: 700; color: var(--text-secondary); }
     .hero-num { font-size: 72px; font-weight: 800; color: var(--cat); letter-spacing: -3px; }
     .hero-hms { display: flex; gap: 16px; }
+    .hero-hms-item { text-align: left; }
     .hero-hms-num { font-size: 24px; font-weight: 800; color: var(--text-primary); }
     .hero-hms-label { font-size: 11px; color: var(--text-secondary); font-weight: 600; margin-top: 2px; }
     
-    .btn-max { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: none; background: var(--surface2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .btn-max { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: none; background: var(--surface2); border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .btn-max img { width: 20px; height: 20px; opacity: 0.6; }
     
     .info-section { margin: 0 20px 32px; }
@@ -36,25 +36,30 @@
     .info-val img { width: 16px; height: 16px; }
     
     .action-section { padding: 0 20px; display: flex; flex-direction: column; gap: 12px; }
-    .btn-full { width: 100%; height: 56px; border-radius: 14px; }
+    .btn-full { width: 100%; height: 56px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; font-size: 15px; }
+    .btn-ghost { background: var(--surface); color: var(--text-secondary); }
+    .btn-danger { background: var(--danger-light); color: var(--danger); }
+    .btn-primary { background: var(--accent); color: white; }
+
+    /* Calendar Picker Styles */
+    .calendar-wrap { background: var(--surface); border-radius: 14px; padding: 20px; margin-top: 10px; }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .cal-month { font-size: 16px; font-weight: 700; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 12px; cursor: pointer; }
+    .cal-date.selected { background: var(--accent); color: white; font-weight: 700; }
+    .cal-date.disabled { opacity: 0.2; pointer-events: none; }
     
-    /* Input Style */
-    .input { width: 100%; padding: 16px; background: var(--surface); border: 1px solid transparent; border-radius: 14px; font-size: 15px; outline: none; }
+    .input { width: 100%; padding: 16px; background: var(--surface); border: 1px solid transparent; border-radius: 14px; font-size: 15px; outline: none; transition: 0.2s; }
     .input:focus { background: white; border-color: var(--accent); }
     .error-msg { color: var(--danger); font-size: 12px; margin-top: 4px; display: none; }
-    
-    /* Slot Machine Base Styles */
+
+    /* Slot Machine */
     .slot-container { display: inline-flex; overflow: hidden; height: 1.2em; vertical-align: bottom; }
     .slot-digit { position: relative; overflow: hidden; height: 1.2em; width: 0.65em; text-align: center; }
     .slot-inner { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; animation: slotRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .slot-num { height: 1.2em; line-height: 1.2em; }
     @keyframes slotRoll { from { transform: translateY(0); } to { transform: translateY(-1.2em); } }
-
-    .btn { display: inline-flex; align-items: center; justify-content: center; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
-    .btn:active { transform: scale(0.96); opacity: 0.8; }
-    .btn-primary { background: var(--accent); color: white; }
-    .btn-danger { background: var(--danger-light); color: var(--danger); }
-    .btn-ghost { background: var(--surface); color: var(--text-secondary); }
   </style>
 </head>
 
@@ -80,41 +85,29 @@
       </div>
 
       <div class="action-section">
-        <button class="btn btn-ghost btn-full" onclick="openEdit()">수정하기</button>
-        <button class="btn btn-danger btn-full" onclick="openDeleteConfirm()">삭제하기</button>
+        <button class="btn-full btn-ghost" onclick="openEdit()">수정하기</button>
+        <button class="btn-full btn-danger" onclick="openDeleteConfirm()">삭제하기</button>
       </div>
 
       <footer class="footer">
-        <span class="footer-label">제작자 정보</span>
-        <div class="footer-main">
-          <img src="jb.png" alt="JB" class="footer-logo">
-          <span class="footer-name">JBJB</span>
-        </div>
-        <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
+        <img src="jb.png" alt="JB" class="footer-logo">
+        <span style="font-size:14px; font-weight:700; color:var(--text-secondary);">JBJB</span>
+        <div style="margin-top:12px;"><a href="https://jbjb777.github.io" class="footer-link">자세히 알아보기</a></div>
       </footer>
     </div>
 
-    <!-- Full Screen Overlay -->
+    <!-- Full Screen -->
     <div class="fs-overlay" id="fsOverlay">
       <div class="fs-content">
         <div class="fs-dday" id="fsDday">D-0</div>
         <div class="fs-hms">
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsH"></div>
-            <div class="fs-hms-label">시간</div>
-          </div>
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsM"></div>
-            <div class="fs-hms-label">분</div>
-          </div>
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsS"></div>
-            <div class="fs-hms-label">초</div>
-          </div>
+          <div class="fs-hms-item"><div class="fs-hms-num" id="fsH"></div><div class="fs-hms-label">시간</div></div>
+          <div class="fs-hms-item"><div class="fs-hms-num" id="fsM"></div><div class="fs-hms-label">분</div></div>
+          <div class="fs-hms-item"><div class="fs-hms-num" id="fsS"></div><div class="fs-hms-label">초</div></div>
         </div>
       </div>
       <button class="exit-fs-btn" id="exitFsBtn" onclick="toggleFullScreen(false)">
-        <img src="min.svg" alt="Minimize">
+        <img src="min.svg" alt="Minimize" style="width:24px; opacity:0.6;">
       </button>
     </div>
 
@@ -122,53 +115,51 @@
     <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
     <div class="popup-sheet" id="editSheet">
       <div class="popup-handle"></div>
-      <div class="popup-title">로그 수정</div>
+      <div style="font-size:20px; font-weight:700; margin-bottom:24px;">로그 수정</div>
+      
       <div style="margin-bottom: 24px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
         <input class="input" id="editTitle" type="text" maxlength="20" oninput="hideError()">
         <div id="titleError" class="error-msg">제목을 입력해 주세요</div>
       </div>
+
       <div style="margin-bottom: 24px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜 및 시간</label>
         <div class="calendar-wrap">
           <div class="cal-header">
-            <button class="cal-btn" onclick="changeMonth(-1)"><img src="back.svg"></button>
+            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(-1)"><img src="back.svg" style="width:20px;"></button>
             <div class="cal-month" id="calMonth"></div>
-            <button class="cal-btn next" onclick="changeMonth(1)"><img src="back.svg"></button>
+            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(1)"><img src="back.svg" style="width:20px; transform:scaleX(-1);"></button>
           </div>
-          <div id="calGridContainer" style="overflow: hidden;"><div class="cal-grid" id="calGrid"></div></div>
-          <div class="time-picker">
-            <div class="time-col">
-              <label class="time-label">시간</label>
-              <select class="time-select" id="editHour"></select>
-            </div>
-            <div class="time-col">
-              <label class="time-label">분</label>
-              <select class="time-select" id="editMin"></select>
-            </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:flex; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--surface2);">
+            <div style="flex:1;"><select class="input" id="editHour" style="padding:10px;"></select></div>
+            <div style="flex:1;"><select class="input" id="editMin" style="padding:10px;"></select></div>
           </div>
         </div>
       </div>
-      <div>
+
+      <div style="margin-bottom:32px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
         <div id="editColorRow" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
-      <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closePopup()">취소</button>
-        <button class="btn btn-primary" onclick="submitEdit()">저장하기</button>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button class="btn-full btn-ghost" onclick="closePopup()">취소</button>
+        <button class="btn-full btn-primary" onclick="submitEdit()">저장하기</button>
       </div>
     </div>
 
-    <!-- Delete confirm popup -->
+    <!-- Delete popup -->
     <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
     <div class="popup-sheet" id="delSheet" style="text-align: center;">
       <div class="popup-handle"></div>
-      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
-      <div class="popup-title" style="margin-bottom: 8px;">정말 삭제할까요?</div>
+      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px;"></div>
+      <div style="font-size:20px; font-weight:700; margin-bottom:8px;">정말 삭제할까요?</div>
       <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14px;">삭제된 로그는 복구할 수 없습니다.</p>
-      <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closeDelPopup()">취소</button>
-        <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">삭제</button>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button class="btn-full btn-ghost" onclick="closeDelPopup()">취소</button>
+        <button class="btn-full btn-primary" style="background:var(--danger);" onclick="confirmDelete()">삭제</button>
       </div>
     </div>
 
@@ -190,6 +181,7 @@
       let selDate = new Date();
       let isFullScreen = false;
       let fsTimer = null;
+      const prevDigits = {};
 
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
       function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
@@ -201,14 +193,12 @@
         prevDigits[key] = str;
         let html = '<div class="slot-container">';
         for (let i = 0; i < str.length; i++) {
-          const d = str[i]; const p = prev[i];
+          const d = str[i], p = prev[i];
           if (d === p) html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
           else html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
         }
-        html += '</div>';
-        el.innerHTML = html;
+        html += '</div>'; el.innerHTML = html;
       }
-      const prevDigits = {};
 
       function renderPage() {
         const item = getItem(); if (!item) { location.href = 'index.html'; return; }
@@ -235,7 +225,7 @@
         document.getElementById('infoRows').innerHTML = `
           <div class="info-row"><span class="info-key">날짜</span><span class="info-val">${formatDateFull(item.date)}</span></div>
           <div class="info-row"><span class="info-key">구분</span><span class="info-val" style="color:${colorObj.hex}">${item.title}</span></div>
-          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${t ? '진행 중' : '완료'} <img src="${t ? 'time.svg' : 'ok.svg'}"></span></div>`;
+          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${t ? '진행 중' : '완료'} <img src="${t ? 'time.svg' : 'ok.svg'}" style="width:16px;"></span></div>`;
       }
 
       function calcDiff(dateStr) {
@@ -259,7 +249,6 @@
         const btn = document.getElementById('exitFsBtn'); btn.classList.remove('hide');
         clearTimeout(fsTimer); fsTimer = setTimeout(() => { if (isFullScreen) btn.classList.add('hide'); }, 1500);
       }
-      document.getElementById('fsOverlay').addEventListener('touchstart', () => { if (isFullScreen) resetFsTimer(); });
 
       function initPicker(existingDate) {
         const h = document.getElementById('editHour'); const m = document.getElementById('editMin');
@@ -272,8 +261,7 @@
         const grid = document.getElementById('calGrid'); const monLabel = document.getElementById('calMonth');
         const y = curViewDate.getFullYear(); const m = curViewDate.getMonth(); monLabel.textContent = `${y}년 ${m + 1}월`;
         const first = new Date(y, m, 1).getDay(); const last = new Date(y, m + 1, 0).getDate();
-        let html = ['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
-        for (let i = 0; i < first; i++) html += '<div></div>';
+        let html = ''; for (let i = 0; i < first; i++) html += '<div></div>';
         const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 1; i <= last; i++) {
           const d = new Date(y, m, i); const isSel = d.getTime() === selDate.getTime();
@@ -295,19 +283,18 @@
         setTimeout(() => sheet.style.transform = '', 300);
       }
       function renderEditColorRow() {
-        document.getElementById('editColorRow').innerHTML = COLORS.map(c => `
-          <div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};" onclick="pickColor('${c.cls}')"></div>`).join('');
+        document.getElementById('editColorRow').innerHTML = COLORS.map(c => `<div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};" onclick="pickColor('${c.cls}')"></div>`).join('');
       }
       function pickColor(cls) { selectedColor = cls; renderEditColorRow(); }
       function submitEdit() {
         const title = document.getElementById('editTitle').value.trim();
         const h = document.getElementById('editHour').value; const m = document.getElementById('editMin').value;
         const finalDate = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, m, 0, 0);
-        if (!title) { document.getElementById('editTitle').style.borderColor = 'var(--danger)'; return; }
+        if (!title) { document.getElementById('titleError').style.display = 'block'; return; }
         const data = getData(); data[idx] = { title, date: finalDate.toISOString(), color: selectedColor }; saveData(data);
         closePopup(); renderPage(); showNotif('D-Day 가 수정되었어요');
       }
-      function hideError() { document.getElementById('editTitle').style.borderColor = 'transparent'; }
+      function hideError() { document.getElementById('titleError').style.display = 'none'; }
       function showNotif(msg) {
         const n = document.getElementById('notif'); n.querySelector('span').textContent = msg; n.classList.add('show');
         setTimeout(() => n.classList.remove('show'), 3000);

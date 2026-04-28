@@ -12,8 +12,9 @@
     .header { padding: 20px; margin-bottom: 10px; }
     .header-title { font-size: 26px; font-weight: 800; letter-spacing: -0.8px; }
     .header-sub { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+    
     .banner-wrap { padding: 0 20px 24px; }
-    .banner { background: var(--accent-light); border-radius: 24px; min-height: 160px; padding: 30px; position: relative; display: flex; flex-direction: column; justify-content: center; transition: 0.2s; }
+    .banner { background: var(--accent-light); border-radius: 24px; min-height: 160px; padding: 30px; position: relative; display: flex; flex-direction: column; justify-content: center; }
     .banner-title { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 12px; }
     .banner-dday { font-size: 48px; font-weight: 800; color: var(--accent); letter-spacing: -2px; }
     
@@ -22,6 +23,7 @@
     .section-count { font-size: 14px; color: var(--text-secondary); }
     
     .card-list { padding: 0 20px; display: flex; flex-direction: column; gap: 16px; }
+    .card { background: var(--surface); border-radius: 20px; cursor: pointer; position: relative; }
     .card-inner { padding: 24px; }
     .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
     .card-title { font-size: 16px; font-weight: 700; }
@@ -33,17 +35,27 @@
     .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; border-radius: 20px; border: none; background: var(--accent); color: white; cursor: pointer; box-shadow: 0 8px 24px rgba(49,130,246,0.3); z-index: 40; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .fab:active { transform: scale(0.9); }
     .fab img { width: 24px; height: 24px; }
-    
+
+    /* Overflow Menu */
+    .overflow-menu { position: absolute; top: 48px; right: 24px; background: white; border: 1px solid var(--border-dark); border-radius: 12px; padding: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); z-index: 100; display: flex; flex-direction: column; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.2s; }
+    .overflow-menu.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .overflow-item { padding: 12px 16px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }
+    .overflow-item:hover { background: var(--surface); }
+
+    /* Calendar */
+    .calendar-wrap { background: var(--surface); border-radius: 14px; padding: 20px; margin-top: 10px; }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .cal-month { font-size: 16px; font-weight: 700; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 12px; cursor: pointer; }
+    .cal-date.selected { background: var(--accent); color: white; font-weight: 700; }
+
+    /* Slot Machine */
     .slot-container { display: inline-flex; overflow: hidden; height: 1.2em; vertical-align: bottom; }
     .slot-digit { position: relative; overflow: hidden; height: 1.2em; width: 0.65em; text-align: center; }
     .slot-inner { display: flex; flex-direction: column; position: absolute; top: 0; left: 0; width: 100%; animation: slotRoll 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
     .slot-num { height: 1.2em; line-height: 1.2em; }
     @keyframes slotRoll { from { transform: translateY(0); } to { transform: translateY(-1.2em); } }
-
-    .overflow-menu { position: absolute; top: 48px; right: 24px; background: white; border: 1px solid var(--border-dark); border-radius: 12px; padding: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); z-index: 100; display: flex; flex-direction: column; opacity: 0; transform: translateY(-10px); pointer-events: none; transition: 0.2s; }
-    .overflow-menu.open { opacity: 1; transform: translateY(0); pointer-events: all; }
-    .overflow-item { padding: 12px 16px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }
-    .overflow-item:hover { background: var(--surface); }
   </style>
 </head>
 
@@ -59,12 +71,12 @@
       <div id="cardList" class="card-list"></div>
       <div id="emptyState" style="display:none; text-align:center; padding: 60px 20px; color: var(--text-secondary);">
         <img src="new.svg" alt="New" style="width: 64px; height: 64px; margin-bottom: 16px; opacity: 0.6;">
-        <div style="font-size: 16px; font-weight: 600;">아직 D-Day가 등록되있지 않아요</div>
+        <div style="font-size: 16px; font-weight: 600;">아직 D-Day가 등록되 있지 않아요</div>
       </div>
       <footer class="footer">
-        <span class="footer-label">제작자 정보</span>
-        <div class="footer-main"><img src="jb.png" alt="JB" class="footer-logo"><span class="footer-name">JBJB</span></div>
-        <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
+        <img src="jb.png" alt="JB" class="footer-logo">
+        <span style="font-size:14px; font-weight:700; color:var(--text-secondary);">JBJB</span>
+        <div style="margin-top:12px;"><a href="https://jbjb777.github.io" class="footer-link">자세히 알아보기</a></div>
       </footer>
     </div>
 
@@ -73,48 +85,47 @@
     <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
     <div class="popup-sheet" id="addSheet">
       <div class="popup-handle"></div>
-      <div class="popup-title">새로운 로그</div>
-      <div style="margin-bottom: 24px;">
+      <div style="font-size:20px; font-weight:700; margin-bottom:24px;">새로운 로그</div>
+      <div style="margin-bottom:24px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
-        <input class="input" id="inputTitle" type="text" placeholder="어떤 일인가요?" maxlength="20" oninput="hideError()">
-        <div id="titleError" class="error-msg" style="color:var(--danger); font-size:12px; display:none;">제목을 입력해 주세요</div>
+        <input class="input" id="inputTitle" type="text" placeholder="어떤 일인가요?" maxlength="20" oninput="hideError()" style="width:100%; padding:16px; background:var(--surface); border:none; border-radius:14px; font-size:15px;">
+        <div id="titleError" style="color:var(--danger); font-size:12px; margin-top:4px; display:none;">제목을 입력해 주세요</div>
       </div>
-      <div style="margin-bottom: 24px;">
+      <div style="margin-bottom:24px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜 및 시간</label>
         <div class="calendar-wrap">
           <div class="cal-header">
-            <button class="cal-btn" style="background:none; border:none; cursor:pointer;" onclick="changeMonth(-1)"><img src="back.svg" style="width:20px;"></button>
+            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(-1)"><img src="back.svg" style="width:20px;"></button>
             <div class="cal-month" id="calMonth"></div>
-            <button class="cal-btn" style="background:none; border:none; cursor:pointer;" onclick="changeMonth(1)"><img src="back.svg" style="width:20px; transform:scaleX(-1);"></button>
+            <button style="background:none; border:none; cursor:pointer;" onclick="changeMonth(1)"><img src="back.svg" style="width:20px; transform:scaleX(-1);"></button>
           </div>
-          <div id="calGridContainer" style="overflow: hidden;"><div class="cal-grid" id="calGrid"></div></div>
-          <div class="time-picker">
-            <div class="time-col"><label class="time-label">시간</label><select class="time-select" id="selHour"></select></div>
-            <div class="time-col"><label class="time-label">분</label><select class="time-select" id="selMin"></select></div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:flex; gap:12px; margin-top:20px; padding-top:16px; border-top:1px solid var(--surface2);">
+            <div style="flex:1;"><select id="selHour" style="width:100%; padding:10px; background:var(--surface2); border:none; border-radius:10px;"></select></div>
+            <div style="flex:1;"><select id="selMin" style="width:100%; padding:10px; background:var(--surface2); border:none; border-radius:10px;"></select></div>
           </div>
         </div>
       </div>
-      <div>
+      <div style="margin-bottom:32px;">
         <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
         <div id="colorRow" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
-      <div class="popup-actions">
-        <button class="btn btn-ghost" style="padding:14px; border-radius:14px;" onclick="closePopup()">취소</button>
-        <button class="btn btn-primary" style="padding:14px; border-radius:14px;" onclick="submitAdd()">추가하기</button>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button style="width:100%; height:56px; border-radius:14px; border:none; background:var(--surface); font-weight:700; cursor:pointer;" onclick="closePopup()">취소</button>
+        <button style="width:100%; height:56px; border-radius:14px; border:none; background:var(--accent); color:white; font-weight:700; cursor:pointer;" onclick="submitAdd()">추가하기</button>
       </div>
     </div>
 
     <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
     <div class="popup-sheet" id="delSheet" style="text-align: center;">
       <div class="popup-handle"></div>
-      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
-      <div class="popup-title">정말 삭제할까요?</div>
-      <div class="popup-actions">
-        <button class="btn btn-ghost" style="padding:14px; border-radius:14px;" onclick="closeDelPopup()">취소</button>
-        <button class="btn btn-primary" style="padding:14px; border-radius:14px; background:var(--danger);" id="confirmDelBtn">삭제</button>
+      <div style="margin: 20px 0;"><img src="del.svg" alt="Delete" style="width: 48px;"></div>
+      <div style="font-size:20px; font-weight:700; margin-bottom:8px;">정말 삭제할까요?</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:32px;">
+        <button style="width:100%; height:56px; border-radius:14px; border:none; background:var(--surface); font-weight:700; cursor:pointer;" onclick="closeDelPopup()">취소</button>
+        <button style="width:100%; height:56px; border-radius:14px; border:none; background:var(--danger); color:white; font-weight:700; cursor:pointer;" id="confirmDelBtn">삭제</button>
       </div>
     </div>
-    <div class="notif-banner" id="notif"><span>D-Day 가 삭제되었어요</span></div>
 
     <script>
       const COLORS = [
@@ -144,8 +155,7 @@
         const grid = document.getElementById('calGrid'); const monLabel = document.getElementById('calMonth');
         const y = curViewDate.getFullYear(); const m = curViewDate.getMonth(); monLabel.textContent = `${y}년 ${m + 1}월`;
         const first = new Date(y, m, 1).getDay(); const last = new Date(y, m + 1, 0).getDate();
-        let html = ['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
-        for (let i = 0; i < first; i++) html += '<div></div>';
+        let html = ''; for (let i = 0; i < first; i++) html += '<div></div>';
         const today = new Date(); today.setHours(0, 0, 0, 0);
         for (let i = 1; i <= last; i++) {
           const d = new Date(y, m, i);
@@ -236,8 +246,7 @@
       function toggleMenu(e, i) { e.stopPropagation(); const m = document.getElementById(`menu${i}`); const isOpen = m.classList.contains('open'); document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')); if (!isOpen) m.classList.add('open'); }
       function deleteConfirm(e, i) { e.stopPropagation(); deleteIdx = i; document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')); document.getElementById('delOverlay').classList.add('open'); document.getElementById('delSheet').classList.add('open'); document.body.classList.add('locked'); }
       function closeDelPopup() { document.getElementById('delOverlay').classList.remove('open'); document.getElementById('delSheet').classList.remove('open'); document.body.classList.remove('locked'); }
-      document.getElementById('confirmDelBtn').onclick = () => { const data = getData(); data.splice(deleteIdx, 1); saveData(data); closeDelPopup(); render(); showNotif('D-Day 가 삭제되었어요'); };
-      function showNotif(msg) { const n = document.getElementById('notif'); n.querySelector('span').textContent = msg; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3000); }
+      document.getElementById('confirmDelBtn').onclick = () => { const data = getData(); data.splice(deleteIdx, 1); saveData(data); closeDelPopup(); render(); };
       function goDetail(i) { localStorage.setItem('ddayIndex', i); location.href = 'detail.html'; }
       function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
       document.addEventListener('click', () => document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')));

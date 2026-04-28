@@ -1,7 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
 
 /* ===== RESET & BASE ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -30,7 +32,8 @@
   --radius-xl: 24px;
 }
 
-html, body {
+html,
+body {
   font-family: 'Pretendard', sans-serif;
   background: var(--bg);
   color: var(--text-primary);
@@ -52,21 +55,29 @@ body.locked {
 }
 
 @keyframes pageIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== POPUP SYSTEM ===== */
 .popup-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
+
 .popup-overlay.open {
   opacity: 1;
   visibility: visible;
@@ -90,6 +101,7 @@ body.locked {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
 .popup-sheet.open {
   transform: translateY(0);
   visibility: visible;
@@ -126,11 +138,15 @@ body.locked {
     opacity: 0;
     max-height: 80vh;
   }
+
   .popup-sheet.open {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
-  .popup-handle { display: none; }
+
+  .popup-handle {
+    display: none;
+  }
 }
 
 /* ===== CALENDAR & PICKER ===== */
@@ -140,21 +156,93 @@ body.locked {
   padding: 16px;
   margin-bottom: 24px;
 }
-.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.cal-month { font-weight: 700; font-size: 15px; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; }
-.cal-day-label { font-size: 11px; color: var(--text-tertiary); padding-bottom: 8px; }
-.cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 10px; cursor: pointer; }
-.cal-date.selected { background: var(--accent); color: white; font-weight: 700; }
-.cal-date.today { color: var(--accent); font-weight: 700; }
-.cal-date.disabled { opacity: 0.15; pointer-events: none; }
 
-.time-picker { display: flex; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--surface2); }
-.time-col { flex: 1; }
-.time-label { font-size: 11px; color: var(--text-tertiary); margin-bottom: 6px; display: block; }
-.time-select { width: 100%; padding: 12px; background: var(--surface2); border: none; border-radius: 10px; outline: none; }
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
 
-.popup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; padding-top: 24px; }
+.cal-month {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.cal-day-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding-bottom: 8px;
+}
+
+.cal-date {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cal-date.selected {
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+.cal-date.today {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.cal-date.disabled {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.time-picker {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--surface2);
+}
+
+.time-col {
+  flex: 1;
+}
+
+.time-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.time-select {
+  width: 100%;
+  padding: 12px;
+  background: var(--surface2);
+  border: none;
+  border-radius: 10px;
+  outline: none;
+}
+
+.popup-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 24px;
+}
 
 /* ===== FULL SCREEN MODE (OPTIMIZED) ===== */
 .fs-overlay {
@@ -171,13 +259,17 @@ body.locked {
   overflow: hidden;
   touch-action: none;
 }
-.fs-overlay.open { display: flex; }
+
+.fs-overlay.open {
+  display: flex;
+}
 
 .fs-content {
   text-align: center;
   width: 100%;
   padding: 0 20px;
 }
+
 .fs-dday {
   font-size: clamp(80px, 20vw, 140px);
   font-weight: 800;
@@ -186,16 +278,19 @@ body.locked {
   line-height: 1;
   letter-spacing: -4px;
 }
+
 .fs-hms {
   display: flex;
   gap: clamp(20px, 5vw, 60px);
   justify-content: center;
 }
+
 .fs-hms-num {
   font-size: clamp(32px, 8vw, 64px);
   font-weight: 800;
   line-height: 1.2;
 }
+
 .fs-hms-label {
   font-size: 12px;
   color: var(--text-secondary);
@@ -215,12 +310,39 @@ body.locked {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transition: opacity 0.3s, transform 0.3s;
 }
-.exit-fs-btn.hide { opacity: 0; transform: translateX(-50%) translateY(20px); pointer-events: none; }
+
+.exit-fs-btn.hide {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
+}
 
 /* ===== OTHER COMPONENTS ===== */
-.card { background: var(--surface); border-radius: 20px; padding: 24px; transition: 0.2s; }
-.notif-banner { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: white; padding: 12px 24px; border-radius: 14px; box-shadow: var(--shadow-lg); transition: 0.4s; z-index: 9999; opacity: 0; }
-.notif-banner.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 24px;
+  transition: 0.2s;
+}
+
+.notif-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: white;
+  padding: 12px 24px;
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  transition: 0.4s;
+  z-index: 9999;
+  opacity: 0;
+}
+
+.notif-banner.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
