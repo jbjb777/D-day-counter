@@ -517,9 +517,11 @@
       }
 
       function closePopup() {
+        const sheet = document.getElementById('editSheet');
         document.getElementById('overlay').classList.remove('open');
-        document.getElementById('editSheet').classList.remove('open');
+        sheet.classList.remove('open');
         document.body.classList.remove('locked');
+        setTimeout(() => sheet.style.transform = '', 300);
       }
 
       function renderEditColorRow() {
@@ -572,9 +574,11 @@
       }
 
       function closeDelPopup() {
+        const sheet = document.getElementById('delSheet');
         document.getElementById('delOverlay').classList.remove('open');
-        document.getElementById('delSheet').classList.remove('open');
+        sheet.classList.remove('open');
         document.body.classList.remove('locked');
+        setTimeout(() => sheet.style.transform = '', 300);
       }
 
       function confirmDelete() {
@@ -586,6 +590,49 @@
       }
 
       function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+      // ===== DRAG TO CLOSE =====
+      function makeDraggable(sheetId, closeFn) {
+        const sheet = document.getElementById(sheetId);
+        const handle = sheet.querySelector('.popup-handle');
+        if (!handle) return;
+        
+        let startY = 0;
+        let currentY = 0;
+        let isDragging = false;
+
+        handle.addEventListener('touchstart', (e) => {
+          startY = e.touches[0].clientY;
+          isDragging = true;
+          sheet.style.transition = 'none';
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', (e) => {
+          if (!isDragging) return;
+          currentY = e.touches[0].clientY;
+          const diff = currentY - startY;
+          if (diff > 0) {
+            sheet.style.transform = `translateY(${diff}px)`;
+          }
+        }, { passive: true });
+
+        handle.addEventListener('touchend', () => {
+          if (!isDragging) return;
+          isDragging = false;
+          sheet.style.transition = '';
+          const diff = currentY - startY;
+          if (diff > 100) {
+            closeFn();
+          } else {
+            sheet.style.transform = '';
+          }
+          startY = 0;
+          currentY = 0;
+        });
+      }
+
+      makeDraggable('editSheet', closePopup);
+      makeDraggable('delSheet', closeDelPopup);
 
       renderPage();
       setInterval(renderPage, 1000);
