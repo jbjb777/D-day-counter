@@ -126,8 +126,16 @@
       justify-content: center;
       transition: background 0.2s;
     }
-    .btn-max:hover { background: var(--border-dark); }
-    .btn-max img { width: 20px; height: 20px; opacity: 0.6; }
+
+    .btn-max:hover {
+      background: var(--border-dark);
+    }
+
+    .btn-max img {
+      width: 20px;
+      height: 20px;
+      opacity: 0.6;
+    }
 
     .info-section {
       margin: 0 20px 32px;
@@ -213,6 +221,15 @@
         <button class="btn btn-ghost btn-full" onclick="openEdit()">수정하기</button>
         <button class="btn btn-danger btn-full" onclick="openDeleteConfirm()">삭제하기</button>
       </div>
+
+      <footer class="footer">
+        <span class="footer-label">제작자 정보</span>
+        <div class="footer-main">
+          <img src="jb.png" alt="JB" class="footer-logo">
+          <span class="footer-name">JBJB</span>
+        </div>
+        <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
+      </footer>
 
     </div>
 
@@ -376,7 +393,7 @@
           slotRender(document.getElementById('hH'), t.h, 'hH');
           slotRender(document.getElementById('hM'), t.m, 'hM');
           slotRender(document.getElementById('hS'), t.s, 'hS');
-          
+
           if (isFullScreen) {
             document.getElementById('fsDday').textContent = `D-${t.d}`;
             slotRender(document.getElementById('fsH'), t.h, 'fsH');
