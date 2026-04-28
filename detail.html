@@ -352,6 +352,23 @@
       let selDate = new Date();
       let isFullScreen = false;
       let fsTimer = null;
+      let scrollY = 0;
+
+      function lockBody() {
+        scrollY = window.scrollY;
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        document.body.classList.add('locked');
+      }
+
+      function unlockBody() {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.classList.remove('locked');
+        window.scrollTo(0, scrollY);
+      }
 
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
       function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
@@ -443,12 +460,12 @@
         const btn = document.getElementById('exitFsBtn');
         if (on) {
           overlay.classList.add('open');
-          document.body.classList.add('locked');
+          lockBody();
           document.body.classList.add('fs-active');
           resetFsTimer();
         } else {
           overlay.classList.remove('open');
-          document.body.classList.remove('locked');
+          unlockBody();
           document.body.classList.remove('fs-active');
           clearTimeout(fsTimer);
         }
@@ -527,14 +544,14 @@
         renderEditColorRow();
         document.getElementById('overlay').classList.add('open');
         document.getElementById('editSheet').classList.add('open');
-        document.body.classList.add('locked');
+        lockBody();
       }
 
       function closePopup() {
         const sheet = document.getElementById('editSheet');
         document.getElementById('overlay').classList.remove('open');
         sheet.classList.remove('open');
-        if (!isFullScreen) document.body.classList.remove('locked');
+        if (!isFullScreen) unlockBody();
         setTimeout(() => sheet.style.transform = '', 300);
       }
 
@@ -584,14 +601,14 @@
       function openDeleteConfirm() {
         document.getElementById('delOverlay').classList.add('open');
         document.getElementById('delSheet').classList.add('open');
-        document.body.classList.add('locked');
+        lockBody();
       }
 
       function closeDelPopup() {
         const sheet = document.getElementById('delSheet');
         document.getElementById('delOverlay').classList.remove('open');
         sheet.classList.remove('open');
-        if (!isFullScreen) document.body.classList.remove('locked');
+        if (!isFullScreen) unlockBody();
         setTimeout(() => sheet.style.transform = '', 300);
       }
 
@@ -628,7 +645,8 @@
           if (diff > 0) {
             sheet.style.transform = `translateY(${diff}px)`;
           }
-        }, { passive: true });
+          if (e.cancelable) e.preventDefault();
+        }, { passive: false });
 
         handle.addEventListener('touchend', () => {
           if (!isDragging) return;

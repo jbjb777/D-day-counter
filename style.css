@@ -49,6 +49,10 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
+html, body {
+  overscroll-behavior: none;
+}
+
 body {
   min-height: 100dvh;
   overflow-x: hidden;
@@ -58,6 +62,8 @@ body {
 
 body.locked {
   overflow: hidden;
+  height: 100%;
+  touch-action: none;
 }
 
 /* Modern body lock fallback using :has() */
@@ -212,8 +218,8 @@ body:has(.popup-overlay.open) {
   background: white;
   visibility: hidden;
   pointer-events: none;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
+  transition: transform 0.3s ease, visibility 0.3s;
+  overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   will-change: transform;
@@ -249,6 +255,7 @@ body:has(.popup-overlay.open) {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    will-change: transform;
   }
   .popup-sheet.open {
     transform: translateY(0);
