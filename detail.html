@@ -433,9 +433,11 @@
         const btn = document.getElementById('exitFsBtn');
         if (on) {
           overlay.classList.add('open');
+          document.body.classList.add('locked');
           resetFsTimer();
         } else {
           overlay.classList.remove('open');
+          document.body.classList.remove('locked');
           clearTimeout(fsTimer);
         }
         renderPage();
