@@ -376,7 +376,7 @@
       }
 
       function pickDate(y, m, d) {
-        selDate = new Date(y, m, d);
+        selDate = new Date(y, m, d, 0, 0, 0, 0);
         renderCalendar();
       }
 
@@ -412,8 +412,7 @@
         const title = titleInput.value.trim();
         const h = document.getElementById('selHour').value;
         const m = document.getElementById('selMin').value;
-        const finalDate = new Date(selDate);
-        finalDate.setHours(h, m, 0, 0);
+        const finalDate = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, m, 0, 0);
 
         if (!title) {
           titleInput.classList.add('error');
