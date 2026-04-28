@@ -562,7 +562,7 @@
 
       function closeDelPopup() {
         const sheet = document.getElementById('delSheet');
-        document.getElementById('delOverlay').classList.remove('open');
+        document.getElementById('overlay').classList.remove('open');
         sheet.classList.remove('open');
         document.body.classList.remove('locked');
         setTimeout(() => sheet.style.transform = '', 300);
