@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>D-Day Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      cursor: pointer;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      margin: 15px auto;
+      border-radius: 12px;
+      width: 300px;
+    }
+
+    .time {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+
+    .delete {
+      margin-top: 10px;
+      background: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📅 D-Day Dashboard</h1>
+
+  <input type="text" id="title" placeholder="이벤트 이름">
+  <input type="datetime-local" id="date">
+  <button onclick="addDday()">추가</button>
+
+  <div id="list"></div>
+
+  <script>
+    function getData() {
+      return JSON.parse(localStorage.getItem('dday') || '[]');
+    }
+
+    function saveData(data) {
+      localStorage.setItem('dday', JSON.stringify(data));
+    }
+
+    function addDday() {
+      const title = document.getElementById('title').value;
+      const date = document.getElementById('date').value;
+
+      if (!title || !date) {
+        alert("값을 입력해라");
+        return;
+      }
+
+      const data = getData();
+      data.push({ title, date });
+      saveData(data);
+
+      document.getElementById('title').value = '';
+      document.getElementById('date').value = '';
+
+      render();
+    }
+
+    function calc(date) {
+      const now = new Date();
+      const target = new Date(date);
+      const diff = target - now;
+
+      if (diff <= 0) return "종료됨";
+
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      return `${d}일 ${h}시간 ${m}분 ${s}초`;
+    }
+
+    function removeItem(index) {
+      const data = getData();
+      data.splice(index, 1);
+      saveData(data);
+      render();
+    }
+
+    function render() {
+      const list = getData();
+      const container = document.getElementById('list');
+      container.innerHTML = '';
+
+      list.forEach((item, i) => {
+        container.innerHTML += `
+          <div class="card">
+            <h3>${item.title}</h3>
+            <div class="time" id="time-${i}"></div>
+            <button class="delete" onclick="removeItem(${i})">삭제</button>
+          </div>
+        `;
+      });
+    }
+
+    function updateTime() {
+      const list = getData();
+      list.forEach((item, i) => {
+        const el = document.getElementById(`time-${i}`);
+        if (el) {
+          el.textContent = calc(item.date);
+        }
+      });
+    }
+
+    render();
+    setInterval(updateTime, 1000);
+  </script>
+
+</body>
+</html>
