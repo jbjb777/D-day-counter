@@ -13,6 +13,7 @@
       max-width: 600px;
       margin: 0 auto;
       padding: 20px 0 100px;
+      min-height: 100vh;
     }
 
     .header {
@@ -543,7 +544,7 @@
         if (!numEl) return;
         if (t) {
           numEl.textContent = t.d;
-          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초 남음</div>`;
+          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}">[...]
           slotRender(document.getElementById(`h${i}`), t.h, `h${i}`);
           slotRender(document.getElementById(`m${i}`), t.m, `m${i}`);
           slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
@@ -701,6 +702,6 @@
       makeDraggable('addSheet', closePopup);
       makeDraggable('delSheet', closeDelPopup);
     </script>
-</body>
+  </body>
 
 </html>
