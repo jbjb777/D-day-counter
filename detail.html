@@ -200,8 +200,6 @@
     }
 
     /* Popups must be above fs-overlay (2000) */
-    .popup-overlay { z-index: 3000; }
-    .popup-sheet { z-index: 3001; }
   </style>
 </head>
 
@@ -355,18 +353,16 @@
       let scrollY = 0;
 
       function lockBody() {
+        if (document.body.classList.contains('locked')) return;
         scrollY = window.scrollY;
-        document.body.style.position = 'fixed';
         document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
         document.body.classList.add('locked');
       }
 
       function unlockBody() {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
+        if (!document.body.classList.contains('locked')) return;
         document.body.classList.remove('locked');
+        document.body.style.top = '';
         window.scrollTo(0, scrollY);
       }
 
@@ -627,7 +623,7 @@
         const sheet = document.getElementById(sheetId);
         const handle = sheet.querySelector('.popup-handle');
         if (!handle) return;
-        
+
         let startY = 0;
         let currentY = 0;
         let isDragging = false;

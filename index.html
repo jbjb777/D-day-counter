@@ -331,18 +331,16 @@
       let scrollY = 0;
 
       function lockBody() {
+        if (document.body.classList.contains('locked')) return;
         scrollY = window.scrollY;
-        document.body.style.position = 'fixed';
         document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
         document.body.classList.add('locked');
       }
 
       function unlockBody() {
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
+        if (!document.body.classList.contains('locked')) return;
         document.body.classList.remove('locked');
+        document.body.style.top = '';
         window.scrollTo(0, scrollY);
       }
 
@@ -410,11 +408,12 @@
       }
 
       function closePopup() {
-        const sheet = document.getElementById('addSheet');
         document.getElementById('overlay').classList.remove('open');
-        sheet.classList.remove('open');
+        document.querySelectorAll('.popup-sheet, .overflow-menu').forEach(el => {
+          el.classList.remove('open');
+          setTimeout(() => el.style.transform = '', 300);
+        });
         unlockBody();
-        setTimeout(() => sheet.style.transform = '', 300);
       }
 
       function renderColorRow() {
@@ -508,6 +507,7 @@
             <img src="more.svg" alt="More" style="width:24px; height:24px;">
           </button>
           <div class="overflow-menu" id="menu${i}">
+            <div class="popup-handle"></div>
             <div class="overflow-item" onclick="goDetail(${i})">수정</div>
             <div class="overflow-item" style="color:var(--danger)" onclick="deleteConfirm(event,${i})">삭제</div>
           </div>
@@ -521,6 +521,11 @@
       </div>`;
           card.onclick = (e) => { if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) goDetail(i); };
           list.appendChild(card);
+          if (window.innerWidth <= 600) makeDraggable(`menu${i}`, () => {
+            document.getElementById(`menu${i}`).classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+            unlockBody();
+          });
           updateCardTime(i, item.date);
         });
         renderBanner();
@@ -565,7 +570,18 @@
         const m = document.getElementById(`menu${i}`);
         const isOpen = m.classList.contains('open');
         document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-        if (!isOpen) m.classList.add('open');
+        if (!isOpen) {
+          m.classList.add('open');
+          if (window.innerWidth <= 600) {
+            document.getElementById('overlay').classList.add('open');
+            lockBody();
+          }
+        } else {
+          if (window.innerWidth <= 600) {
+            document.getElementById('overlay').classList.remove('open');
+            unlockBody();
+          }
+        }
       }
 
       function deleteConfirm(e, i) {
@@ -616,7 +632,16 @@
       }
 
       function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-      document.addEventListener('click', () => document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open')));
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) {
+          const wasOpen = document.querySelector('.overflow-menu.open');
+          document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
+          if (wasOpen && window.innerWidth <= 600) {
+            document.getElementById('overlay').classList.remove('open');
+            unlockBody();
+          }
+        }
+      });
 
       setInterval(() => {
         const data = getData();
@@ -637,7 +662,7 @@
         const sheet = document.getElementById(sheetId);
         const handle = sheet.querySelector('.popup-handle');
         if (!handle) return;
-        
+
         let startY = 0;
         let currentY = 0;
         let isDragging = false;
