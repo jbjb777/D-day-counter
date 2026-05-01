@@ -8,12 +8,11 @@
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/svg+xml" href="./logo.png">
   <style>
-    /* ===== HOME SPECIFIC (Flat 2) ===== */
+    /* ===== HOME SPECIFIC (Flat 2D) ===== */
     .app {
       max-width: 600px;
       margin: 0 auto;
       padding: 20px 0 100px;
-      min-height: 100vh;
     }
 
     .header {
@@ -544,7 +543,7 @@
         if (!numEl) return;
         if (t) {
           numEl.textContent = t.d;
-          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}">[...]
+          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초 남음</div>`;
           slotRender(document.getElementById(`h${i}`), t.h, `h${i}`);
           slotRender(document.getElementById(`m${i}`), t.m, `m${i}`);
           slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
@@ -702,6 +701,6 @@
       makeDraggable('addSheet', closePopup);
       makeDraggable('delSheet', closeDelPopup);
     </script>
-  </body>
+</body>
 
 </html>

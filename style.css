@@ -66,6 +66,7 @@ body {
 body.locked {
   overflow: hidden;
   height: 100dvh;
+  position: fixed;
   width: 100%;
   left: 0;
 }
@@ -298,7 +299,7 @@ body:has(.popup-overlay.open) {
     padding: 8px 24px 32px;
     padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     transform: translateY(100%);
-    max-height: 90vh;
+    max-height: 92dvh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -320,8 +321,6 @@ body:has(.popup-overlay.open) {
     left: 50%;
     transform: translate(-50%, -45%) scale(0.95);
     width: 400px;
-    max-height: 90vh;
-    overflow-y: auto;
     border-radius: var(--radius-lg);
     padding: 32px;
     opacity: 0;
