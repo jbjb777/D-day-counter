@@ -240,6 +240,7 @@
       </footer>
 
     </div>
+  </div>
 
     <button class="fab" onclick="openAddPopup()">
       <img src="plus.svg" alt="Add">
@@ -331,17 +332,23 @@
       let scrollY = 0;
 
       function lockBody() {
-        if (document.body.classList.contains('locked')) return;
-        scrollY = window.scrollY;
-        document.body.style.top = `-${scrollY}px`;
-        document.body.classList.add('locked');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('overlay').addEventListener('touchmove', preventDefaultScroll, { passive: false });
+        if (document.getElementById('delOverlay')) {
+          document.getElementById('delOverlay').addEventListener('touchmove', preventDefaultScroll, { passive: false });
+        }
+      }
+
+      function preventDefaultScroll(e) {
+        e.preventDefault();
       }
 
       function unlockBody() {
-        if (!document.body.classList.contains('locked')) return;
-        document.body.classList.remove('locked');
-        document.body.style.top = '';
-        window.scrollTo(0, scrollY);
+        document.body.style.overflow = '';
+        document.getElementById('overlay').removeEventListener('touchmove', preventDefaultScroll);
+        if (document.getElementById('delOverlay')) {
+          document.getElementById('delOverlay').removeEventListener('touchmove', preventDefaultScroll);
+        }
       }
 
       function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
@@ -411,7 +418,8 @@
         document.getElementById('overlay').classList.remove('open');
         document.querySelectorAll('.popup-sheet, .overflow-menu').forEach(el => {
           el.classList.remove('open');
-          setTimeout(() => el.style.transform = '', 300);
+          // Reset transform after transition finishes to avoid ghost space
+          setTimeout(() => { if (!el.classList.contains('open')) el.style.transform = ''; }, 440);
         });
         unlockBody();
       }
@@ -598,7 +606,7 @@
         document.getElementById('delOverlay').classList.remove('open');
         sheet.classList.remove('open');
         unlockBody();
-        setTimeout(() => sheet.style.transform = '', 300);
+        setTimeout(() => { if (!sheet.classList.contains('open')) sheet.style.transform = ''; }, 440);
       }
 
       document.getElementById('confirmDelBtn').onclick = () => {
@@ -664,38 +672,85 @@
         if (!handle) return;
 
         let startY = 0;
-        let currentY = 0;
-        let isDragging = false;
+        let dragActive = false;
+        let expanded = false;
+        const isMenu = sheet.classList.contains('overflow-menu');
 
-        handle.addEventListener('touchstart', (e) => {
+        const dismissPx = () => Math.min(window.innerHeight * 0.24, 150);
+        const expandPx = () => -56;
+        const collapsePx = () => 92;
+
+        function setExpanded(v) {
+          if (isMenu) return;
+          expanded = !!v;
+          sheet.classList.toggle('expanded', expanded);
+        }
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((m) => {
+            if (m.attributeName === 'class') {
+              if (!sheet.classList.contains('open')) {
+                setExpanded(false);
+                sheet.style.transform = '';
+                delete sheet.dataset.pull;
+              }
+            }
+          });
+        });
+        observer.observe(sheet, { attributes: true });
+
+        const dragArea = document.createElement('div');
+        dragArea.style.padding = '16px';
+        dragArea.style.margin = '-16px -16px 0';
+        handle.parentNode.insertBefore(dragArea, handle);
+        dragArea.appendChild(handle);
+
+        dragArea.addEventListener('touchstart', (e) => {
           startY = e.touches[0].clientY;
-          isDragging = true;
-          sheet.style.transition = 'none';
+          dragActive = true;
+          sheet.classList.add('dragging');
         }, { passive: true });
 
-        handle.addEventListener('touchmove', (e) => {
-          if (!isDragging) return;
-          currentY = e.touches[0].clientY;
-          const diff = currentY - startY;
-          if (diff > 0) {
-            sheet.style.transform = `translateY(${diff}px)`;
-          }
+        dragArea.addEventListener('touchmove', (e) => {
+          if (!dragActive) return;
+          const dy = e.touches[0].clientY - startY;
+          const minTy = expanded ? -Math.min(140, window.innerHeight * 0.14) : -Math.min(110, window.innerHeight * 0.12);
+          const maxTy = window.innerHeight * 0.55;
+          const ty = Math.max(minTy, Math.min(maxTy, dy));
+          sheet.dataset.pull = String(ty);
+          sheet.style.transform = `translateY(${ty}px)`;
           if (e.cancelable) e.preventDefault();
         }, { passive: false });
 
-        handle.addEventListener('touchend', () => {
-          if (!isDragging) return;
-          isDragging = false;
-          sheet.style.transition = '';
-          const diff = currentY - startY;
-          if (diff > 100) {
+        const endDrag = () => {
+          if (!dragActive) return;
+          dragActive = false;
+          sheet.classList.remove('dragging');
+          const ty = parseFloat(sheet.dataset.pull || '0') || 0;
+          sheet.style.transform = '';
+          delete sheet.dataset.pull;
+
+          const dPx = dismissPx();
+          const exPx = expandPx();
+          const colPx = collapsePx();
+
+          if (ty > dPx) {
             closeFn();
-          } else {
-            sheet.style.transform = '';
+            return;
           }
-          startY = 0;
-          currentY = 0;
-        });
+          if (isMenu) return;
+          if (!expanded && ty < exPx) {
+            setExpanded(true);
+            return;
+          }
+          if (expanded && ty > colPx && ty <= dPx) {
+            setExpanded(false);
+            return;
+          }
+        };
+
+        dragArea.addEventListener('touchend', endDrag);
+        dragArea.addEventListener('touchcancel', endDrag);
       }
 
       makeDraggable('addSheet', closePopup);
