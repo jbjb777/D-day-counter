@@ -18,6 +18,15 @@
     .header {
       padding: 20px;
       margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .header-title {
@@ -31,6 +40,39 @@
       color: var(--text-secondary);
       margin-top: 6px;
     }
+
+    .header-profile-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+      color: #666;
+    }
+    .header-profile-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { color: var(--text-primary); background: var(--surface); }
 
     .banner-wrap {
       padding: 0 20px 24px;
@@ -205,8 +247,16 @@
     <div class="app">
 
       <div class="header">
-        <div class="header-title">D-Day</div>
-        <div id="headerSub" class="header-sub">오늘도 힘차게! 🚀</div>
+        <div class="header-left">
+          <div>
+            <div class="header-title">D-Day</div>
+            <div id="headerSub" class="header-sub">오늘도 힘차게! 🚀</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="header-profile-avatar" id="headerAvatar"></div>
+          <button class="logout-btn" onclick="logout()">로그아웃</button>
+        </div>
       </div>
 
       <div class="banner-wrap">
@@ -315,6 +365,29 @@
     </div>
 
     <script>
+      const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
+
+      async function api(endpoint, options = {}) {
+        const url = API_BASE + endpoint;
+        const res = await fetch(url, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+        });
+        if (!res.ok) {
+          let errorText = "";
+          try { errorText = await res.text(); } catch {}
+          throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
+        }
+        if (res.status === 204 || res.headers.get("content-length") === "0") return null;
+        try { return await res.json(); } catch (e) {
+          console.warn("JSON 파싱 실패했지만 2xx 성공으로 간주:", e);
+          return null;
+        }
+      }
+
       const COLORS = [
         { cls: 'cat-blue', hex: '#3182F6' },
         { cls: 'cat-purple', hex: '#8B5CF6' },
@@ -330,6 +403,8 @@
       let selDate = new Date(); selDate.setHours(0, 0, 0, 0);
       let deleteIdx = -1;
       let scrollY = 0;
+      let currentUser = null;
+      let allPosts = [];
 
       function lockBody() {
         document.body.style.overflow = 'hidden';
@@ -351,8 +426,43 @@
         }
       }
 
-      function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
-      function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
+      function logout() {
+        localStorage.removeItem('snsUser');
+        location.href = 'index.html';
+      }
+
+      function setAvatar(el, profileImage, nickname) {
+        if (profileImage) {
+          el.innerHTML = `<img src="${profileImage}" alt="${nickname || ''}">`;
+        } else {
+          el.textContent = (nickname?.[0] || '?').toUpperCase();
+        }
+      }
+
+      async function initPage() {
+        const savedUser = localStorage.getItem('snsUser');
+        if (!savedUser) {
+          alert('로그인이 필요합니다.');
+          location.href = 'index.html';
+          return;
+        }
+        currentUser = JSON.parse(savedUser);
+
+        const headerAvatar = document.getElementById('headerAvatar');
+        setAvatar(headerAvatar, currentUser.profile_image || null, currentUser.nickname);
+
+        await loadPosts();
+        render();
+      }
+
+      async function loadPosts() {
+        try {
+          const posts = await api(`/posts?author_id=eq.${encodeURIComponent(currentUser.id)}&type=eq.day&order=created_at.desc`);
+          allPosts = posts || [];
+        } catch (error) {
+          console.error('포스트 로드 오류:', error);
+        }
+      }
 
       // ===== CALENDAR =====
       function initPicker() {
@@ -418,7 +528,6 @@
         document.getElementById('overlay').classList.remove('open');
         document.querySelectorAll('.popup-sheet, .overflow-menu').forEach(el => {
           el.classList.remove('open');
-          // Reset transform after transition finishes to avoid ghost space
           setTimeout(() => { if (!el.classList.contains('open')) el.style.transform = ''; }, 440);
         });
         unlockBody();
@@ -434,7 +543,7 @@
 
       function pickColor(cls) { selectedColor = cls; renderColorRow(); }
 
-      function submitAdd() {
+      async function submitAdd() {
         const titleInput = document.getElementById('inputTitle');
         const errorMsg = document.getElementById('titleError');
         const title = titleInput.value.trim();
@@ -449,11 +558,27 @@
         }
         if (finalDate <= new Date()) { alert('미래의 시간을 선택해주세요.'); return; }
 
-        const data = getData();
-        data.push({ title, date: finalDate.toISOString(), color: selectedColor });
-        saveData(data);
-        closePopup();
-        render();
+        try {
+          await api("/posts", {
+            method: "POST",
+            body: JSON.stringify({
+              author: currentUser.nickname,
+              author_id: currentUser.id,
+              content: title,
+              color: selectedColor,
+              target_date: finalDate.toISOString(),
+              type: "day",
+              created_at: new Date().toISOString()
+            })
+          });
+          closePopup();
+          await loadPosts();
+          render();
+          showNotif('D-Day 가 추가되었어요');
+        } catch (error) {
+          console.error('추가 오류:', error);
+          alert('추가에 실패했습니다.');
+        }
       }
 
       function hideError() {
@@ -490,18 +615,17 @@
       }
 
       function render() {
-        const data = getData();
         const list = document.getElementById('cardList');
         const empty = document.getElementById('emptyState');
         const cnt = document.getElementById('sectionCount');
 
         list.innerHTML = '';
-        cnt.textContent = `${data.length}개`;
-        if (!data.length) { empty.style.display = 'block'; document.getElementById('bannerCard').style.display = 'none'; return; }
+        cnt.textContent = `${allPosts.length}개`;
+        if (!allPosts.length) { empty.style.display = 'block'; document.getElementById('bannerCard').style.display = 'none'; return; }
         empty.style.display = 'none';
         document.getElementById('bannerCard').style.display = 'flex';
 
-        data.forEach((item, i) => {
+        allPosts.forEach((item, i) => {
           const colorObj = COLORS.find(c => c.cls === item.color) || COLORS[0];
           const card = document.createElement('div');
           card.className = `card ${item.color}`;
@@ -510,7 +634,7 @@
       <div class="card-inner">
         <div class="card-dot" style="background:${colorObj.hex}"></div>
         <div class="card-top">
-          <div class="card-title">${escHtml(item.title)}</div>
+          <div class="card-title">${escHtml(item.content)}</div>
           <button style="width:32px; height:32px; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="toggleMenu(event,${i})">
             <img src="more.svg" alt="More" style="width:24px; height:24px;">
           </button>
@@ -525,7 +649,7 @@
           <span class="card-d-num" id="dnum${i}" style="color:${colorObj.hex}"></span>
         </div>
         <div class="card-hms" id="hms${i}"></div>
-        <div class="card-date" style="margin-top:12px; font-size:12px; color:var(--text-tertiary)">${formatDateSimple(item.date)}</div>
+        <div class="card-date" style="margin-top:12px; font-size:12px; color:var(--text-tertiary)">${formatDateSimple(item.target_date)}</div>
       </div>`;
           card.onclick = (e) => { if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) goDetail(i); };
           list.appendChild(card);
@@ -534,7 +658,7 @@
             document.getElementById('overlay').classList.remove('open');
             unlockBody();
           });
-          updateCardTime(i, item.date);
+          updateCardTime(i, item.target_date);
         });
         renderBanner();
       }
@@ -551,7 +675,7 @@
         if (!numEl) return;
         if (t) {
           numEl.textContent = t.d;
-          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초 남음</div>`;
+          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초</div>`;
           slotRender(document.getElementById(`h${i}`), t.h, `h${i}`);
           slotRender(document.getElementById(`m${i}`), t.m, `m${i}`);
           slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
@@ -562,13 +686,12 @@
       }
 
       function renderBanner() {
-        const data = getData();
         const bc = document.getElementById('bannerContent');
-        if (!data.length) return;
-        const item = data[0];
-        const t = calcDiff(item.date);
+        if (!allPosts.length) return;
+        const item = allPosts[0];
+        const t = calcDiff(item.target_date);
         bc.innerHTML = `
-    <div class="banner-title">${escHtml(item.title)}</div>
+    <div class="banner-title">${escHtml(item.content)}</div>
     <div class="banner-dday">D-${t ? t.d : 'Day'}</div>
   `;
       }
@@ -609,13 +732,18 @@
         setTimeout(() => { if (!sheet.classList.contains('open')) sheet.style.transform = ''; }, 440);
       }
 
-      document.getElementById('confirmDelBtn').onclick = () => {
-        const data = getData();
-        data.splice(deleteIdx, 1);
-        saveData(data);
-        closeDelPopup();
-        render();
-        showNotif('D-Day 가 삭제되었어요');
+      document.getElementById('confirmDelBtn').onclick = async () => {
+        try {
+          const item = allPosts[deleteIdx];
+          await api(`/posts?id=eq.${item.id}`, { method: 'DELETE' });
+          closeDelPopup();
+          await loadPosts();
+          render();
+          showNotif('D-Day 가 삭제되었어요');
+        } catch (error) {
+          console.error('삭제 오류:', error);
+          alert('삭제에 실패했습니다.');
+        }
       };
 
       function showNotif(msg) {
@@ -623,15 +751,6 @@
         n.querySelector('span').textContent = msg;
         n.classList.add('show');
         setTimeout(() => n.classList.remove('show'), 3000);
-      }
-
-      // Check for pending notifications
-      const lastNotif = localStorage.getItem('lastNotif');
-      if (lastNotif) {
-        setTimeout(() => {
-          showNotif(lastNotif);
-          localStorage.removeItem('lastNotif');
-        }, 500);
       }
 
       function goDetail(i) {
@@ -652,12 +771,8 @@
       });
 
       setInterval(() => {
-        const data = getData();
-        data.forEach((item, i) => updateCardTime(i, item.date));
+        allPosts.forEach((item, i) => updateCardTime(i, item.target_date));
       }, 1000);
-
-      render();
-      setHeaderDate();
 
       function setHeaderDate() {
         const d = new Date();
@@ -755,6 +870,9 @@
 
       makeDraggable('addSheet', closePopup);
       makeDraggable('delSheet', closeDelPopup);
+
+      initPage();
+      setHeaderDate();
     </script>
 </body>
 
