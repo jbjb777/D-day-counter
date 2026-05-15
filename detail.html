@@ -92,6 +92,7 @@
     .hero-hms {
       display: flex;
       gap: 16px;
+      font-size: 16px;
     }
 
     .hero-hms-item {
@@ -99,9 +100,10 @@
     }
 
     .hero-hms-num {
-      font-size: 24px;
+      font-size: 16px;
       font-weight: 800;
       color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
     }
 
     .hero-hms-label {
@@ -199,526 +201,226 @@
       margin: 0;
     }
 
-    /* Popups must be above fs-overlay (2000) */
+    /* Slot Machine Animation */
+    .slot-container {
+      display: flex;
+      gap: 0;
+    }
+
+    .slot-digit {
+      overflow: hidden;
+      height: 1em;
+      line-height: 1;
+    }
+
+    .slot-inner {
+      animation: slot-spin 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .slot-num {
+      line-height: 1;
+      height: 1em;
+      display: block;
+    }
+
+    @keyframes slot-spin {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(-1em);
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="page-wrapper">
     <div class="app">
-
       <div class="nav">
-        <button class="nav-back" onclick="location.href='index.html'">
+        <button class="nav-back" onclick="history.back()">
           <img src="back.svg" alt="Back">
         </button>
-        <div class="nav-title">로그 상세</div>
+        <div class="nav-title" id="navTitle">로그</div>
       </div>
 
       <div class="hero" id="hero">
-        <button class="btn-max" onclick="toggleFullScreen(true)">
-          <img src="max.svg" alt="Maximize">
+        <button class="btn-max" onclick="toggleFS()" id="fsBtn" style="display:none;">
+          <img src="max.svg">
         </button>
-        <div id="heroContent"></div>
+        <div class="hero-category" id="heroCategory"></div>
+        <div class="hero-title" id="heroTitle">로딩 중...</div>
+        <div class="hero-dday-row">
+          <span class="hero-prefix">D</span>
+          <span class="hero-num" id="heroDday"></span>
+        </div>
+        <div class="hero-hms">
+          <div class="hero-hms-item">
+            <div class="hero-hms-num" id="heroHour">00</div>
+            <div class="hero-hms-label">시</div>
+          </div>
+          <div class="hero-hms-item">
+            <div class="hero-hms-num" id="heroMin">00</div>
+            <div class="hero-hms-label">분</div>
+          </div>
+          <div class="hero-hms-item">
+            <div class="hero-hms-num" id="heroSec">00</div>
+            <div class="hero-hms-label">초</div>
+          </div>
+        </div>
       </div>
 
       <div class="info-section">
-        <div id="infoRows"></div>
+        <div class="info-row">
+          <span class="info-key">목표일</span>
+          <span class="info-val" id="targetDate">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-key">남은 시간</span>
+          <span class="info-val" id="remainTime">-</span>
+        </div>
       </div>
 
       <div class="action-section">
-        <button class="btn btn-ghost btn-full" onclick="openEdit()">수정하기</button>
-        <button class="btn btn-danger btn-full" onclick="openDeleteConfirm()">삭제하기</button>
+        <button class="btn btn-primary btn-full" onclick="deleteItem()">삭제하기</button>
       </div>
-
-      <footer class="footer">
-        <span class="footer-label">제작자 정보</span>
-        <div class="footer-main">
-          <img src="jb.png" alt="JB" class="footer-logo">
-          <span class="footer-name">JBJB</span>
-        </div>
-        <a href="https://jbjb777.github.io" class="footer-link" target="_blank">자세히 알아보기</a>
-      </footer>
-
     </div>
   </div>
 
-    <!-- Full Screen Overlay -->
-    <div class="fs-overlay" id="fsOverlay">
-      <div class="fs-content">
-        <div class="fs-dday" id="fsDday">D-0</div>
-        <div class="fs-hms">
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsH"></div>
-            <div class="fs-hms-label">시간</div>
-          </div>
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsM"></div>
-            <div class="fs-hms-label">분</div>
-          </div>
-          <div class="fs-hms-item">
-            <div class="fs-hms-num" id="fsS"></div>
-            <div class="fs-hms-label">초</div>
-          </div>
-        </div>
-      </div>
-      <button class="exit-fs-btn" id="exitFsBtn" onclick="toggleFullScreen(false)">
-        <img src="min.svg" alt="Minimize">
-      </button>
+  <!-- Delete confirmation -->
+  <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
+  <div class="popup-sheet" id="delSheet" style="text-align: center; padding-top: 40px;">
+    <div style="margin-bottom: 20px;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
+    <div class="popup-title" style="margin-bottom: 8px;">정말 삭제할까요?</div>
+    <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14px;">삭제된 로그는 복구할 수 없습니다.</p>
+    <div class="popup-actions">
+      <button class="btn btn-ghost" onclick="closeDelPopup()">취소</button>
+      <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">삭제</button>
     </div>
+  </div>
 
-    <!-- Edit popup -->
-    <div class="popup-overlay" id="overlay" onclick="closePopup()"></div>
-    <div class="popup-sheet" id="editSheet">
-      <div class="popup-handle"></div>
-      <div class="popup-title">로그 수정</div>
+  <script>
+    const COLORS = [
+      { cls: 'cat-blue', hex: '#3182F6' },
+      { cls: 'cat-purple', hex: '#8B5CF6' },
+      { cls: 'cat-pink', hex: '#F43F5E' },
+      { cls: 'cat-orange', hex: '#FF9500' },
+      { cls: 'cat-green', hex: '#00BA54' },
+      { cls: 'cat-red', hex: '#F04452' },
+      { cls: 'cat-teal', hex: '#00C7BE' },
+    ];
 
-      <div style="margin-bottom: 24px;">
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">이름</label>
-        <input class="input" id="editTitle" type="text" placeholder="어떤 일인가요?" maxlength="20" oninput="hideError()">
-        <div id="titleError" class="error-msg">제목을 입력해 주세요</div>
-      </div>
+    let currentItem = null;
+    let currentIndex = -1;
+    let colorMap = {};
+    COLORS.forEach(c => colorMap[c.cls] = c.hex);
 
-      <div style="margin-bottom: 24px;">
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">날짜
-          및 시간</label>
-        <div class="calendar-wrap">
-          <div class="cal-header">
-            <button class="cal-btn" onclick="changeMonth(-1)"><img src="back.svg"></button>
-            <div class="cal-month" id="calMonth"></div>
-            <button class="cal-btn next" onclick="changeMonth(1)"><img src="back.svg"></button>
-          </div>
-          <div id="calGridContainer" style="overflow: hidden;">
-            <div class="cal-grid" id="calGrid"></div>
-          </div>
-          <div class="time-picker">
-            <div class="time-col">
-              <label class="time-label">시간</label>
-              <select class="time-select" id="editHour"></select>
-            </div>
-            <div class="time-col">
-              <label class="time-label">분</label>
-              <select class="time-select" id="editMin"></select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <label
-          style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">색상</label>
-        <div id="editColorRow" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-      </div>
-
-      <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closePopup()">취소</button>
-        <button class="btn btn-primary" onclick="submitEdit()">저장하기</button>
-      </div>
-    </div>
-
-    <!-- Delete confirm popup -->
-    <div class="popup-overlay" id="delOverlay" onclick="closeDelPopup()"></div>
-    <div class="popup-sheet" id="delSheet" style="text-align: center; padding-top: 40px;">
-      <div style="margin-bottom: 20px;"><img src="del.svg" alt="Delete" style="width: 48px; height: 48px;"></div>
-      <div class="popup-title" style="margin-bottom: 8px;">정말 삭제할까요?</div>
-      <p style="color: var(--text-secondary); margin-bottom: 32px; font-size: 14px;">삭제된 로그는 복구할 수 없습니다.</p>
-      <div class="popup-actions">
-        <button class="btn btn-ghost" onclick="closeDelPopup()">취소</button>
-        <button class="btn btn-primary" style="background:var(--danger)" onclick="confirmDelete()">삭제</button>
-      </div>
-    </div>
-
-    <!-- Notification -->
-    <div class="notif-banner" id="notif">
-      <span>D-Day 가 수정되었어요</span>
-    </div>
-
-    <script>
-      const COLORS = [
-        { cls: 'cat-blue', hex: '#3182F6' },
-        { cls: 'cat-purple', hex: '#8B5CF6' },
-        { cls: 'cat-pink', hex: '#F43F5E' },
-        { cls: 'cat-orange', hex: '#FF9500' },
-        { cls: 'cat-green', hex: '#00BA54' },
-        { cls: 'cat-red', hex: '#F04452' },
-        { cls: 'cat-teal', hex: '#00C7BE' },
-      ];
-
-      let idx = parseInt(localStorage.getItem('ddayIndex') || '0');
-      let selectedColor = 'cat-blue';
-      let curViewDate = new Date();
-      let selDate = new Date();
-      let isFullScreen = false;
-      let fsTimer = null;
-      let scrollY = 0;
-
-      function lockBody() {
-        document.body.style.overflow = 'hidden';
-        document.getElementById('overlay').addEventListener('touchmove', preventDefaultScroll, { passive: false });
-        if (document.getElementById('delOverlay')) {
-          document.getElementById('delOverlay').addEventListener('touchmove', preventDefaultScroll, { passive: false });
-        }
-      }
-
-      function preventDefaultScroll(e) {
-        e.preventDefault();
-      }
-
-      function unlockBody() {
-        document.body.style.overflow = '';
-        document.getElementById('overlay').removeEventListener('touchmove', preventDefaultScroll);
-        if (document.getElementById('delOverlay')) {
-          document.getElementById('delOverlay').removeEventListener('touchmove', preventDefaultScroll);
-        }
-      }
-
-      function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
-      function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
-      function getItem() { return getData()[idx]; }
-
-      // ===== SLOT MACHINE =====
-      const prevDigits = {};
-      function slotRender(el, value, key) {
-        const str = String(value).padStart(2, '0');
-        const prev = prevDigits[key] || str;
-        prevDigits[key] = str;
-        let html = '<div class="slot-container">';
-        for (let i = 0; i < str.length; i++) {
-          const d = str[i];
-          const p = prev[i];
-          if (d === p) {
-            html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
-          } else {
-            html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
-          }
-        }
-        html += '</div>';
-        el.innerHTML = html;
-      }
-
-      // ===== RENDER =====
-      function renderPage() {
-        const item = getItem();
-        if (!item) { location.href = 'index.html'; return; }
-        const colorObj = COLORS.find(c => c.cls === item.color) || COLORS[0];
-        document.documentElement.style.setProperty('--cat', colorObj.hex);
-
-        const t = calcDiff(item.date);
-        const hero = document.getElementById('heroContent');
-        hero.innerHTML = `
-          <div class="hero-category">UPCOMING EVENT</div>
-          <div class="hero-title">${escHtml(item.title)}</div>
-          <div class="hero-dday-row">
-            <span class="hero-prefix">D-</span>
-            <span class="hero-num" id="heroNum">${t ? t.d : 'Day'}</span>
-          </div>
-          <div class="hero-hms">
-            <div class="hero-hms-item"><div class="hero-hms-num" id="hH"></div><div class="hero-hms-label">시간</div></div>
-            <div class="hero-hms-item"><div class="hero-hms-num" id="hM"></div><div class="hero-hms-label">분</div></div>
-            <div class="hero-hms-item"><div class="hero-hms-num" id="hS"></div><div class="hero-hms-label">초</div></div>
-          </div>`;
-
-        if (t) {
-          slotRender(document.getElementById('hH'), t.h, 'hH');
-          slotRender(document.getElementById('hM'), t.m, 'hM');
-          slotRender(document.getElementById('hS'), t.s, 'hS');
-
-          if (isFullScreen) {
-            document.getElementById('fsDday').textContent = `D-${t.d}`;
-            slotRender(document.getElementById('fsH'), t.h, 'fsH');
-            slotRender(document.getElementById('fsM'), t.m, 'fsM');
-            slotRender(document.getElementById('fsS'), t.s, 'fsS');
-          }
+    const prevDigits = {};
+    function slotRender(el, value, key) {
+      const str = String(value).padStart(2, '0');
+      const prev = prevDigits[key] || str;
+      prevDigits[key] = str;
+      let html = '<div class="slot-container">';
+      for (let i = 0; i < str.length; i++) {
+        const d = str[i];
+        const p = prev[i];
+        if (d === p) {
+          html += `<div class="slot-digit"><div class="slot-num">${d}</div></div>`;
         } else {
-          document.querySelectorAll('.hero-hms-num').forEach(el => el.textContent = '00');
-          if (isFullScreen) document.getElementById('fsDday').textContent = 'D-Day';
+          html += `<div class="slot-digit"><div class="slot-inner"><div class="slot-num">${p}</div><div class="slot-num">${d}</div></div></div>`;
         }
+      }
+      html += '</div>';
+      el.innerHTML = html;
+    }
 
-        const statusText = t ? '진행 중' : '완료';
-        const statusIcon = t ? 'time.svg' : 'ok.svg';
+    function calcDiff(dateStr) {
+      const diff = new Date(dateStr) - new Date();
+      if (diff <= 0) return null;
+      const s = Math.floor(diff / 1000);
+      return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
+    }
 
-        document.getElementById('infoRows').innerHTML = `
-          <div class="info-row"><span class="info-key">날짜</span><span class="info-val">${formatDateFull(item.date)}</span></div>
-          <div class="info-row"><span class="info-key">구분</span><span class="info-val" style="color:${colorObj.hex}">${item.title}</span></div>
-          <div class="info-row"><span class="info-key">상태</span><span class="info-val">${statusText} <img src="${statusIcon}"></span></div>`;
+    function loadFromLocalStorage() {
+      const params = new URLSearchParams(window.location.search);
+      const title = params.get('u');
+      
+      if (!title) {
+        document.getElementById('heroTitle').textContent = '항목을 찾을 수 없습니다';
+        return;
       }
 
-      function calcDiff(dateStr) {
-        const diff = new Date(dateStr) - new Date();
-        if (diff <= 0) return null;
-        const s = Math.floor(diff / 1000);
-        return { d: Math.floor(s / 86400), h: Math.floor((s % 86400) / 3600), m: Math.floor((s % 3600) / 60), s: s % 60 };
+      const data = JSON.parse(localStorage.getItem('dday') || '[]');
+      const item = data.find(i => i.title === title);
+
+      if (!item) {
+        document.getElementById('heroTitle').textContent = '항목을 찾을 수 없습니다';
+        return;
       }
 
-      function formatDateFull(dateStr) {
-        const d = new Date(dateStr);
-        return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      currentItem = item;
+      currentIndex = data.indexOf(item);
+      renderDetail();
+    }
+
+    function renderDetail() {
+      if (!currentItem) return;
+
+      const diff = calcDiff(currentItem.date);
+      if (!diff) {
+        document.getElementById('heroTitle').textContent = '완료됨';
+        return;
       }
 
-      // ===== FULL SCREEN =====
-      function toggleFullScreen(on) {
-        isFullScreen = on;
-        const overlay = document.getElementById('fsOverlay');
-        const btn = document.getElementById('exitFsBtn');
-        if (on) {
-          overlay.classList.add('open');
-          lockBody();
-          document.body.classList.add('fs-active');
-          resetFsTimer();
-        } else {
-          overlay.classList.remove('open');
-          unlockBody();
-          document.body.classList.remove('fs-active');
-          clearTimeout(fsTimer);
-        }
-        renderPage();
-      }
+      document.getElementById('heroTitle').textContent = currentItem.title;
+      document.getElementById('heroCategory').textContent = '';
+      document.getElementById('heroCategory').style.background = colorMap[currentItem.color];
+      document.getElementById('heroCategory').style.width = '8px';
+      document.getElementById('heroCategory').style.height = '8px';
+      document.getElementById('heroCategory').style.borderRadius = '50%';
+      document.getElementById('heroCategory').style.margin = '0';
 
-      function resetFsTimer() {
-        const btn = document.getElementById('exitFsBtn');
-        btn.classList.remove('hide');
-        clearTimeout(fsTimer);
-        fsTimer = setTimeout(() => {
-          if (isFullScreen) btn.classList.add('hide');
-        }, 1500);
-      }
+      slotRender(document.getElementById('heroDday'), diff.d, 'heroDday');
+      slotRender(document.getElementById('heroHour'), diff.h, 'heroHour');
+      slotRender(document.getElementById('heroMin'), diff.m, 'heroMin');
+      slotRender(document.getElementById('heroSec'), diff.s, 'heroSec');
 
-      document.getElementById('fsOverlay').addEventListener('mousedown', () => {
-        if (isFullScreen) resetFsTimer();
-      });
-      document.getElementById('fsOverlay').addEventListener('touchstart', () => {
-        if (isFullScreen) resetFsTimer();
-      });
+      const targetDate = new Date(currentItem.date);
+      document.getElementById('targetDate').textContent = targetDate.toLocaleDateString('ko-KR');
+      document.getElementById('remainTime').textContent = `${diff.d}일 ${diff.h}시간 ${diff.m}분`;
+    }
 
-      // ===== CALENDAR =====
-      function initPicker(existingDate) {
-        const h = document.getElementById('editHour');
-        const m = document.getElementById('editMin');
-        h.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}시</option>`).join('');
-        m.innerHTML = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${String(i).padStart(2, '0')}분</option>`).join('');
-        const d = new Date(existingDate);
-        curViewDate = new Date(d);
-        selDate = new Date(d); selDate.setHours(0, 0, 0, 0);
-        h.value = d.getHours();
-        m.value = d.getMinutes();
-        renderCalendar();
-      }
+    function toggleFS() {
+      document.body.classList.toggle('fs-active');
+    }
 
-      function renderCalendar() {
-        const grid = document.getElementById('calGrid');
-        const monLabel = document.getElementById('calMonth');
-        const y = curViewDate.getFullYear();
-        const m = curViewDate.getMonth();
-        monLabel.textContent = `${y}년 ${m + 1}월`;
-        const first = new Date(y, m, 1).getDay();
-        const last = new Date(y, m + 1, 0).getDate();
-        let html = ['일', '월', '화', '수', '목', '금', '토'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
-        for (let i = 0; i < first; i++) html += '<div></div>';
-        const today = new Date(); today.setHours(0, 0, 0, 0);
-        for (let i = 1; i <= last; i++) {
-          const d = new Date(y, m, i);
-          const isSel = d.getTime() === selDate.getTime();
-          const isToday = d.getTime() === today.getTime();
-          const isPast = d.getTime() < today.getTime();
-          html += `<div class="cal-date ${isSel ? 'selected' : ''} ${isToday ? 'today' : ''} ${isPast ? 'disabled' : ''}" 
-              onclick="pickDate(${y},${m},${i})">${i}</div>`;
-        }
-        grid.innerHTML = html;
-      }
+    function deleteItem() {
+      document.getElementById('delOverlay').classList.add('open');
+      document.getElementById('delSheet').classList.add('open');
+    }
 
-      function changeMonth(dir) {
-        const grid = document.getElementById('calGrid');
-        grid.classList.remove('slide-left', 'slide-right');
-        void grid.offsetWidth;
-        grid.classList.add(dir > 0 ? 'slide-left' : 'slide-right');
-        curViewDate.setMonth(curViewDate.getMonth() + dir);
-        renderCalendar();
-      }
+    function closeDelPopup() {
+      document.getElementById('delOverlay').classList.remove('open');
+      document.getElementById('delSheet').classList.remove('open');
+    }
 
-      function pickDate(y, m, d) { selDate = new Date(y, m, d, 0, 0, 0, 0); renderCalendar(); }
+    function confirmDelete() {
+      const data = JSON.parse(localStorage.getItem('dday') || '[]');
+      data.splice(currentIndex, 1);
+      localStorage.setItem('dday', JSON.stringify(data));
+      closeDelPopup();
+      history.back();
+    }
 
-      // ===== ACTIONS =====
-      function openEdit() {
-        const item = getItem();
-        document.getElementById('editTitle').value = item.title;
-        selectedColor = item.color || 'cat-blue';
-        initPicker(item.date);
-        renderEditColorRow();
-        document.getElementById('overlay').classList.add('open');
-        document.getElementById('editSheet').classList.add('open');
-        lockBody();
-      }
+    function initPage() {
+      loadFromLocalStorage();
+      setInterval(() => {
+        if (currentItem) renderDetail();
+      }, 1000);
+    }
 
-      function closePopup() {
-        const sheet = document.getElementById('editSheet');
-        document.getElementById('overlay').classList.remove('open');
-        sheet.classList.remove('open');
-        if (!isFullScreen) unlockBody();
-        setTimeout(() => { if (!sheet.classList.contains('open')) sheet.style.transform = ''; }, 440);
-      }
-
-      function renderEditColorRow() {
-        const row = document.getElementById('editColorRow');
-        row.innerHTML = COLORS.map(c => `
-    <div style="width:32px; height:32px; border-radius:50%; background:${c.hex}; cursor:pointer; 
-      border: 3px solid ${c.cls === selectedColor ? 'white' : 'transparent'}; outline: ${c.cls === selectedColor ? '2px solid ' + c.hex : 'none'};"
-      onclick="pickColor('${c.cls}')"></div>`).join('');
-      }
-
-      function pickColor(cls) { selectedColor = cls; renderEditColorRow(); }
-
-      function submitEdit() {
-        const titleInput = document.getElementById('editTitle');
-        const errorMsg = document.getElementById('titleError');
-        const title = titleInput.value.trim();
-        const h = document.getElementById('editHour').value;
-        const m = document.getElementById('editMin').value;
-        const finalDate = new Date(selDate.getFullYear(), selDate.getMonth(), selDate.getDate(), h, m, 0, 0);
-
-        if (!title) {
-          titleInput.classList.add('error');
-          errorMsg.style.display = 'block';
-          return;
-        }
-        const data = getData();
-        data[idx] = { title, date: finalDate.toISOString(), color: selectedColor };
-        saveData(data);
-        closePopup();
-        renderPage();
-        showNotif('D-Day 가 수정되었어요');
-      }
-
-      function hideError() {
-        document.getElementById('editTitle').classList.remove('error');
-        document.getElementById('titleError').style.display = 'none';
-      }
-
-      function showNotif(msg) {
-        const n = document.getElementById('notif');
-        n.querySelector('span').textContent = msg;
-        n.classList.add('show');
-        setTimeout(() => n.classList.remove('show'), 3000);
-      }
-
-      function openDeleteConfirm() {
-        document.getElementById('delOverlay').classList.add('open');
-        document.getElementById('delSheet').classList.add('open');
-        lockBody();
-      }
-
-      function closeDelPopup() {
-        const sheet = document.getElementById('delSheet');
-        document.getElementById('delOverlay').classList.remove('open');
-        sheet.classList.remove('open');
-        if (!isFullScreen) unlockBody();
-        setTimeout(() => { if (!sheet.classList.contains('open')) sheet.style.transform = ''; }, 440);
-      }
-
-      function confirmDelete() {
-        const data = getData();
-        data.splice(idx, 1);
-        saveData(data);
-        localStorage.setItem('lastNotif', 'D-Day 가 삭제되었어요');
-        location.href = 'index.html';
-      }
-
-      function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-
-      // ===== DRAG TO CLOSE =====
-      function makeDraggable(sheetId, closeFn) {
-        const sheet = document.getElementById(sheetId);
-        const handle = sheet.querySelector('.popup-handle');
-        if (!handle) return;
-
-        let startY = 0;
-        let dragActive = false;
-        let expanded = false;
-        const isMenu = sheet.classList.contains('overflow-menu');
-
-        const dismissPx = () => Math.min(window.innerHeight * 0.24, 150);
-        const expandPx = () => -56;
-        const collapsePx = () => 92;
-
-        function setExpanded(v) {
-          if (isMenu) return;
-          expanded = !!v;
-          sheet.classList.toggle('expanded', expanded);
-        }
-
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((m) => {
-            if (m.attributeName === 'class') {
-              if (!sheet.classList.contains('open')) {
-                setExpanded(false);
-                sheet.style.transform = '';
-                delete sheet.dataset.pull;
-              }
-            }
-          });
-        });
-        observer.observe(sheet, { attributes: true });
-
-        const dragArea = document.createElement('div');
-        dragArea.style.padding = '16px';
-        dragArea.style.margin = '-16px -16px 0';
-        handle.parentNode.insertBefore(dragArea, handle);
-        dragArea.appendChild(handle);
-
-        dragArea.addEventListener('touchstart', (e) => {
-          startY = e.touches[0].clientY;
-          dragActive = true;
-          sheet.classList.add('dragging');
-        }, { passive: true });
-
-        dragArea.addEventListener('touchmove', (e) => {
-          if (!dragActive) return;
-          const dy = e.touches[0].clientY - startY;
-          const minTy = expanded ? -Math.min(140, window.innerHeight * 0.14) : -Math.min(110, window.innerHeight * 0.12);
-          const maxTy = window.innerHeight * 0.55;
-          const ty = Math.max(minTy, Math.min(maxTy, dy));
-          sheet.dataset.pull = String(ty);
-          sheet.style.transform = `translateY(${ty}px)`;
-          if (e.cancelable) e.preventDefault();
-        }, { passive: false });
-
-        const endDrag = () => {
-          if (!dragActive) return;
-          dragActive = false;
-          sheet.classList.remove('dragging');
-          const ty = parseFloat(sheet.dataset.pull || '0') || 0;
-          sheet.style.transform = '';
-          delete sheet.dataset.pull;
-
-          const dPx = dismissPx();
-          const exPx = expandPx();
-          const colPx = collapsePx();
-
-          if (ty > dPx) {
-            closeFn();
-            return;
-          }
-          if (isMenu) return;
-          if (!expanded && ty < exPx) {
-            setExpanded(true);
-            return;
-          }
-          if (expanded && ty > colPx && ty <= dPx) {
-            setExpanded(false);
-            return;
-          }
-        };
-
-        dragArea.addEventListener('touchend', endDrag);
-        dragArea.addEventListener('touchcancel', endDrag);
-      }
-
-      makeDraggable('editSheet', closePopup);
-      makeDraggable('delSheet', closeDelPopup);
-
-      renderPage();
-      setInterval(renderPage, 1000);
-    </script>
+    initPage();
+  </script>
 </body>
 
 </html>

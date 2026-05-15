@@ -168,9 +168,6 @@
       display: flex;
       gap: 10px;
       margin-top: 4px;
-    }
-
-    .card-hms-item {
       font-size: 12px;
       color: var(--text-secondary);
       font-weight: 500;
@@ -239,6 +236,37 @@
       gap: 12px;
       margin-top: 32px;
     }
+
+    /* Slot Machine Animation */
+    .slot-container {
+      display: flex;
+      gap: 0;
+    }
+
+    .slot-digit {
+      overflow: hidden;
+      height: 1em;
+      line-height: 1;
+    }
+
+    .slot-inner {
+      animation: slot-spin 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .slot-num {
+      line-height: 1;
+      height: 1em;
+      display: block;
+    }
+
+    @keyframes slot-spin {
+      from {
+        transform: translateY(0);
+      }
+      to {
+        transform: translateY(-1em);
+      }
+    }
   </style>
 </head>
 
@@ -253,10 +281,10 @@
             <div id="headerSub" class="header-sub">오늘도 힘차게! 🚀</div>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div class="header-profile-avatar" id="headerAvatar"></div>
-          <button class="logout-btn" onclick="logout()">로그아웃</button>
+        <div class="header-profile-avatar" id="profileAvatar" style="display:none;">
+          <img id="profileImg" src="" alt="profile">
         </div>
+        <button class="logout-btn" id="logoutBtn" style="display:none;" onclick="logout()">로그아웃</button>
       </div>
 
       <div class="banner-wrap">
@@ -365,47 +393,6 @@
     </div>
 
     <script>
-      const API_BASE = "https://sharer-api.alexeom97.workers.dev/api";
-
-      async function api(endpoint, options = {}) {
-        const url = API_BASE + endpoint;
-        const savedUser = localStorage.getItem('snsUser');
-        let token = null;
-
-        // localStorage에서 토큰 추출
-        if (savedUser) {
-          try {
-            const user = JSON.parse(savedUser);
-            token = user.access_token;
-          } catch (e) {
-            console.warn('토큰 파싱 오류:', e);
-          }
-        }
-
-        const headers = {
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-          ...(options.headers || {}),
-        };
-
-        const res = await fetch(url, {
-          ...options,
-          headers,
-        });
-
-        if (!res.ok) {
-          let errorText = "";
-          try { errorText = await res.text(); } catch {}
-          throw new Error(`API 오류 (${res.status}): ${errorText || "알 수 없는 오류"}`);
-        }
-
-        if (res.status === 204 || res.headers.get("content-length") === "0") return null;
-        try { return await res.json(); } catch (e) {
-          console.warn("JSON 파싱 실패했지만 2xx 성공으로 간주:", e);
-          return null;
-        }
-      }
-
       const COLORS = [
         { cls: 'cat-blue', hex: '#3182F6' },
         { cls: 'cat-purple', hex: '#8B5CF6' },
@@ -421,8 +408,6 @@
       let selDate = new Date(); selDate.setHours(0, 0, 0, 0);
       let deleteIdx = -1;
       let scrollY = 0;
-      let currentUser = null;
-      let allPosts = [];
 
       function lockBody() {
         document.body.style.overflow = 'hidden';
@@ -444,43 +429,8 @@
         }
       }
 
-      function logout() {
-        localStorage.removeItem('snsUser');
-        location.href = 'index.html';
-      }
-
-      function setAvatar(el, profileImage, nickname) {
-        if (profileImage) {
-          el.innerHTML = `<img src="${profileImage}" alt="${nickname || ''}">`;
-        } else {
-          el.textContent = (nickname?.[0] || '?').toUpperCase();
-        }
-      }
-
-      async function initPage() {
-        const savedUser = localStorage.getItem('snsUser');
-        if (!savedUser) {
-          alert('로그인이 필요합니다.');
-          location.href = 'index.html';
-          return;
-        }
-        currentUser = JSON.parse(savedUser);
-
-        const headerAvatar = document.getElementById('headerAvatar');
-        setAvatar(headerAvatar, currentUser.profile_image || null, currentUser.nickname);
-
-        await loadPosts();
-        render();
-      }
-
-      async function loadPosts() {
-        try {
-          const posts = await api(`/posts?author_id=eq.${encodeURIComponent(currentUser.id)}&type=eq.day&order=created_at.desc`);
-          allPosts = posts || [];
-        } catch (error) {
-          console.error('포스트 로드 오류:', error);
-        }
-      }
+      function getData() { return JSON.parse(localStorage.getItem('dday') || '[]'); }
+      function saveData(d) { localStorage.setItem('dday', JSON.stringify(d)); }
 
       // ===== CALENDAR =====
       function initPicker() {
@@ -561,7 +511,7 @@
 
       function pickColor(cls) { selectedColor = cls; renderColorRow(); }
 
-      async function submitAdd() {
+      function submitAdd() {
         const titleInput = document.getElementById('inputTitle');
         const errorMsg = document.getElementById('titleError');
         const title = titleInput.value.trim();
@@ -576,27 +526,11 @@
         }
         if (finalDate <= new Date()) { alert('미래의 시간을 선택해주세요.'); return; }
 
-        try {
-          await api("/posts", {
-            method: "POST",
-            body: JSON.stringify({
-              author: currentUser.nickname,
-              author_id: currentUser.id,
-              content: title,
-              color: selectedColor,
-              target_date: finalDate.toISOString(),
-              type: "day",
-              created_at: new Date().toISOString()
-            })
-          });
-          closePopup();
-          await loadPosts();
-          render();
-          showNotif('D-Day 가 추가되었어요');
-        } catch (error) {
-          console.error('추가 오류:', error);
-          alert('추가에 실패했습니다. ' + error.message);
-        }
+        const data = getData();
+        data.push({ title, date: finalDate.toISOString(), color: selectedColor });
+        saveData(data);
+        closePopup();
+        render();
       }
 
       function hideError() {
@@ -633,265 +567,74 @@
       }
 
       function render() {
+        const data = getData();
         const list = document.getElementById('cardList');
         const empty = document.getElementById('emptyState');
         const cnt = document.getElementById('sectionCount');
 
         list.innerHTML = '';
-        cnt.textContent = `${allPosts.length}개`;
-        if (!allPosts.length) { empty.style.display = 'block'; document.getElementById('bannerCard').style.display = 'none'; return; }
+        cnt.textContent = `${data.length}개`;
+        if (!data.length) { empty.style.display = 'block'; document.getElementById('bannerCard').style.display = 'none'; return; }
         empty.style.display = 'none';
-        document.getElementById('bannerCard').style.display = 'flex';
+        document.getElementById('bannerCard').style.display = 'block';
 
-        allPosts.forEach((item, i) => {
-          const colorObj = COLORS.find(c => c.cls === item.color) || COLORS[0];
+        const closest = data.reduce((a, b) => {
+          const da = calcDiff(a.date);
+          const db = calcDiff(b.date);
+          return (!da || !db) ? a : (da.d < db.d ? a : b);
+        });
+
+        if (closest) {
+          const diff = calcDiff(closest.date);
+          let bannerHtml = `<div style="padding:32px; border-radius: var(--radius-lg);"><div style="font-size:13px; color:var(--text-secondary); font-weight:600; margin-bottom:8px;">${closest.title}</div>
+            <div style="display:flex; align-items:baseline; gap:4px;"><span style="font-size:48px; font-weight:800; color:${closest.color === 'cat-blue' ? '#3182F6' : closest.color === 'cat-purple' ? '#8B5CF6' : closest.color === 'cat-pink' ? '#F43F5E' : closest.color === 'cat-orange' ? '#FF9500' : closest.color === 'cat-green' ? '#00BA54' : closest.color === 'cat-red' ? '#F04452' : '#00C7BE'};" id="bannerNum">${diff.d}</span><span style="font-size:24px; font-weight:700; color:var(--text-secondary);">일</span></div></div>`;
+          document.getElementById('bannerCard').innerHTML = bannerHtml;
+          document.getElementById('bannerCard').onclick = () => window.location.href = `detail.html?u=${encodeURIComponent(closest.title)}`;
+        }
+
+        let i = 0;
+        for (const item of data) {
+          const diff = calcDiff(item.date);
+          if (!diff) continue;
+          const colorMap = { 'cat-blue': '#3182F6', 'cat-purple': '#8B5CF6', 'cat-pink': '#F43F5E', 'cat-orange': '#FF9500', 'cat-green': '#00BA54', 'cat-red': '#F04452', 'cat-teal': '#00C7BE' };
           const card = document.createElement('div');
-          card.className = `card ${item.color}`;
-          card.style.animationDelay = `${i * 0.05}s`;
+          card.className = 'card';
+          card.onclick = () => window.location.href = `detail.html?u=${encodeURIComponent(item.title)}`;
           card.innerHTML = `
-      <div class="card-inner">
-        <div class="card-dot" style="background:${colorObj.hex}"></div>
-        <div class="card-top">
-          <div class="card-title">${escHtml(item.content)}</div>
-          <button style="width:32px; height:32px; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;" onclick="toggleMenu(event,${i})">
-            <img src="more.svg" alt="More" style="width:24px; height:24px;">
-          </button>
-          <div class="overflow-menu" id="menu${i}">
-            <div class="popup-handle"></div>
-            <div class="overflow-item" onclick="goDetail(${i})">수정</div>
-            <div class="overflow-item" style="color:var(--danger)" onclick="deleteConfirm(event,${i})">삭제</div>
-          </div>
-        </div>
-        <div class="card-dday-row">
-          <span class="card-d-prefix">D-</span>
-          <span class="card-d-num" id="dnum${i}" style="color:${colorObj.hex}"></span>
-        </div>
-        <div class="card-hms" id="hms${i}"></div>
-        <div class="card-date" style="margin-top:12px; font-size:12px; color:var(--text-tertiary)">${formatDateSimple(item.target_date)}</div>
-      </div>`;
-          card.onclick = (e) => { if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) goDetail(i); };
+          <div class="card-inner">
+            <div class="card-top"><div class="card-title">${item.title}</div></div>
+            <div class="card-dot" style="background:${colorMap[item.color]}"></div>
+            <div class="card-dday-row"><span class="card-d-prefix">D</span><span class="card-d-num" id="d${i}"></span></div>
+            <div class="card-hms"><span id="h${i}" class="card-hms-num">00</span>시 <span id="m${i}" class="card-hms-num">00</span>분 <span id="s${i}" class="card-hms-num">00</span>초</div>
+            <div class="card-date">${new Date(item.date).toLocaleDateString('ko-KR')}</div>
+          </div>`;
           list.appendChild(card);
-          if (window.innerWidth <= 600) makeDraggable(`menu${i}`, () => {
-            document.getElementById(`menu${i}`).classList.remove('open');
-            document.getElementById('overlay').classList.remove('open');
-            unlockBody();
-          });
-          updateCardTime(i, item.target_date);
-        });
-        renderBanner();
-      }
-
-      function formatDateSimple(dateStr) {
-        const d = new Date(dateStr);
-        return `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-      }
-
-      function updateCardTime(i, dateStr) {
-        const t = calcDiff(dateStr);
-        const numEl = document.getElementById(`dnum${i}`);
-        const hmsEl = document.getElementById(`hms${i}`);
-        if (!numEl) return;
-        if (t) {
-          numEl.textContent = t.d;
-          hmsEl.innerHTML = `<div class="card-hms-item"><span class="card-hms-num" id="h${i}"></span>시간 <span class="card-hms-num" id="m${i}"></span>분 <span class="card-hms-num" id="s${i}"></span>초</div>`;
-          slotRender(document.getElementById(`h${i}`), t.h, `h${i}`);
-          slotRender(document.getElementById(`m${i}`), t.m, `m${i}`);
-          slotRender(document.getElementById(`s${i}`), t.s, `s${i}`);
-        } else {
-          numEl.textContent = 'Day';
-          hmsEl.textContent = '종료된 로그입니다.';
+          slotRender(document.getElementById(`d${i}`), diff.d, `d${i}`);
+          slotRender(document.getElementById(`h${i}`), diff.h, `h${i}`);
+          slotRender(document.getElementById(`m${i}`), diff.m, `m${i}`);
+          slotRender(document.getElementById(`s${i}`), diff.s, `s${i}`);
+          i++;
         }
       }
 
-      function renderBanner() {
-        const bc = document.getElementById('bannerContent');
-        if (!allPosts.length) return;
-        const item = allPosts[0];
-        const t = calcDiff(item.target_date);
-        bc.innerHTML = `
-    <div class="banner-title">${escHtml(item.content)}</div>
-    <div class="banner-dday">D-${t ? t.d : 'Day'}</div>
-  `;
+      function logout() {
+        localStorage.removeItem('user');
+        location.reload();
       }
 
-      function toggleMenu(e, i) {
-        e.stopPropagation();
-        const m = document.getElementById(`menu${i}`);
-        const isOpen = m.classList.contains('open');
-        document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-        if (!isOpen) {
-          m.classList.add('open');
-          if (window.innerWidth <= 600) {
-            document.getElementById('overlay').classList.add('open');
-            lockBody();
-          }
-        } else {
-          if (window.innerWidth <= 600) {
-            document.getElementById('overlay').classList.remove('open');
-            unlockBody();
-          }
+      function initPage() {
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        if (user) {
+          document.getElementById('profileAvatar').style.display = 'flex';
+          document.getElementById('profileImg').src = user.avatar || '';
+          document.getElementById('logoutBtn').style.display = 'block';
         }
+        render();
+        setInterval(render, 1000);
       }
-
-      function deleteConfirm(e, i) {
-        e.stopPropagation();
-        deleteIdx = i;
-        document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-        document.getElementById('delOverlay').classList.add('open');
-        document.getElementById('delSheet').classList.add('open');
-        lockBody();
-      }
-
-      function closeDelPopup() {
-        const sheet = document.getElementById('delSheet');
-        document.getElementById('delOverlay').classList.remove('open');
-        sheet.classList.remove('open');
-        unlockBody();
-        setTimeout(() => { if (!sheet.classList.contains('open')) sheet.style.transform = ''; }, 440);
-      }
-
-      document.getElementById('confirmDelBtn').onclick = async () => {
-        try {
-          const item = allPosts[deleteIdx];
-          await api(`/posts?id=eq.${item.id}`, { method: 'DELETE' });
-          closeDelPopup();
-          await loadPosts();
-          render();
-          showNotif('D-Day 가 삭제되었어요');
-        } catch (error) {
-          console.error('삭제 오류:', error);
-          alert('삭제에 실패했습니다.');
-        }
-      };
-
-      function showNotif(msg) {
-        const n = document.getElementById('notif');
-        n.querySelector('span').textContent = msg;
-        n.classList.add('show');
-        setTimeout(() => n.classList.remove('show'), 3000);
-      }
-
-      function goDetail(i) {
-        localStorage.setItem('ddayIndex', i);
-        location.href = 'detail.html';
-      }
-
-      function escHtml(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.overflow-menu') && !e.target.closest('.btn-icon')) {
-          const wasOpen = document.querySelector('.overflow-menu.open');
-          document.querySelectorAll('.overflow-menu').forEach(el => el.classList.remove('open'));
-          if (wasOpen && window.innerWidth <= 600) {
-            document.getElementById('overlay').classList.remove('open');
-            unlockBody();
-          }
-        }
-      });
-
-      setInterval(() => {
-        allPosts.forEach((item, i) => updateCardTime(i, item.target_date));
-      }, 1000);
-
-      function setHeaderDate() {
-        const d = new Date();
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        document.getElementById('headerSub').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]}) · 오늘도 힘차게! 🚀`;
-      }
-
-      // ===== DRAG TO CLOSE =====
-      function makeDraggable(sheetId, closeFn) {
-        const sheet = document.getElementById(sheetId);
-        const handle = sheet.querySelector('.popup-handle');
-        if (!handle) return;
-
-        let startY = 0;
-        let dragActive = false;
-        let expanded = false;
-        const isMenu = sheet.classList.contains('overflow-menu');
-
-        const dismissPx = () => Math.min(window.innerHeight * 0.24, 150);
-        const expandPx = () => -56;
-        const collapsePx = () => 92;
-
-        function setExpanded(v) {
-          if (isMenu) return;
-          expanded = !!v;
-          sheet.classList.toggle('expanded', expanded);
-        }
-
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((m) => {
-            if (m.attributeName === 'class') {
-              if (!sheet.classList.contains('open')) {
-                setExpanded(false);
-                sheet.style.transform = '';
-                delete sheet.dataset.pull;
-              }
-            }
-          });
-        });
-        observer.observe(sheet, { attributes: true });
-
-        const dragArea = document.createElement('div');
-        dragArea.style.padding = '16px';
-        dragArea.style.margin = '-16px -16px 0';
-        handle.parentNode.insertBefore(dragArea, handle);
-        dragArea.appendChild(handle);
-
-        dragArea.addEventListener('touchstart', (e) => {
-          startY = e.touches[0].clientY;
-          dragActive = true;
-          sheet.classList.add('dragging');
-        }, { passive: true });
-
-        dragArea.addEventListener('touchmove', (e) => {
-          if (!dragActive) return;
-          const dy = e.touches[0].clientY - startY;
-          const minTy = expanded ? -Math.min(140, window.innerHeight * 0.14) : -Math.min(110, window.innerHeight * 0.12);
-          const maxTy = window.innerHeight * 0.55;
-          const ty = Math.max(minTy, Math.min(maxTy, dy));
-          sheet.dataset.pull = String(ty);
-          sheet.style.transform = `translateY(${ty}px)`;
-          if (e.cancelable) e.preventDefault();
-        }, { passive: false });
-
-        const endDrag = () => {
-          if (!dragActive) return;
-          dragActive = false;
-          sheet.classList.remove('dragging');
-          const ty = parseFloat(sheet.dataset.pull || '0') || 0;
-          sheet.style.transform = '';
-          delete sheet.dataset.pull;
-
-          const dPx = dismissPx();
-          const exPx = expandPx();
-          const colPx = collapsePx();
-
-          if (ty > dPx) {
-            closeFn();
-            return;
-          }
-          if (isMenu) return;
-          if (!expanded && ty < exPx) {
-            setExpanded(true);
-            return;
-          }
-          if (expanded && ty > colPx && ty <= dPx) {
-            setExpanded(false);
-            return;
-          }
-        };
-
-        dragArea.addEventListener('touchend', endDrag);
-        dragArea.addEventListener('touchcancel', endDrag);
-      }
-
-      makeDraggable('addSheet', closePopup);
-      makeDraggable('delSheet', closeDelPopup);
 
       initPage();
-      setHeaderDate();
     </script>
-</body>
+  </body>
 
 </html>
