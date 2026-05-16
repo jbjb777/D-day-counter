@@ -45,8 +45,10 @@ pre {
 <h2>결과</h2>
 <pre id="result"></pre>
 
+
 <script>
-const API = "https://d-log-api.alexeom97.workers.dev";
+const API =
+  "https://d-log-api.alexeom97.workers.dev/api/posts";
 
 async function loadPosts() {
   const res = await fetch(API);
@@ -58,6 +60,7 @@ async function loadPosts() {
 }
 
 async function createPost() {
+
   const content =
     document.getElementById("content").value;
 
